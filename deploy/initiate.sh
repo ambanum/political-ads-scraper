@@ -23,3 +23,5 @@ run scp $KEYARG deploy/work.sh $SERVER:$REMOTE_SCRIPT_PATH
 echo
 echo "---- Running deployment script on remote server ----"
 run ssh $SERVER bash $REMOTE_SCRIPT_PATH
+
+echo "Fine! Now you should update the data by running: scp data/ads-archive_FR_latest.json cloud@desinfo.quaidorsay.fr:/home/cloud/political-ads-scraper/data"
