@@ -1,11 +1,12 @@
 import json
 import datetime
+import os
 
 import requests
 
 import creds
 
-
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 FIELDS = [
     'ad_creation_time',
     'ad_creative_body',
@@ -74,7 +75,7 @@ def fetch(country_code, search_params):
 def write_to_file(country_code='FR'):
     ads = fetch(country_code=country_code, search_params={'search_terms': "''"})
     
-    filename_format = 'data/ads-archive_' + country_code + '_{}.json'
+    filename_format = ROOT_DIR + '/data/ads-archive_' + country_code + '_{}.json'
 
     filename_date = filename_format.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     filename_latest = filename_format.format('latest')
