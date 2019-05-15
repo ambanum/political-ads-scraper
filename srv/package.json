@@ -1,0 +1,23 @@
+{
+  "name": "ads-backend",
+  "version": "0.0.1",
+  "description": "Serve data about political ads",
+  "scripts": {
+    "start": "node ./bin/run.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ambanum/political-ads-scraper.git"
+  },
+  "author": "",
+  "license": "EUPL-1.2",
+  "bugs": {
+    "url": "https://github.com/ambanum/political-ads-scraper/issues"
+  },
+  "homepage": "https://github.com/ambanum/political-ads-scraper#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
+  }
+}

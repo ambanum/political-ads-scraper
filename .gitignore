@@ -4,3 +4,5 @@ creds.py
 __pycache__
 
 data
+
+node_modules
