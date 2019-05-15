@@ -4,7 +4,7 @@ set -e
 ### Configuration ###
 
 APP_DIR=/home/cloud/political-ads-scraper
-GIT_URL=git@github.com:ambanum/political_ads_scraper.git
+GIT_URL=git@github.com:ambanum/political-ads-scraper.git
 
 ### Automation steps ###
 
