@@ -26,4 +26,4 @@ npm install --production
 npm prune --production
 
 # Restart app
-forever restart bin/www || forever start bin/www
+forever restart bin/run || forever start bin/run
