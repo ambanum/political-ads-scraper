@@ -36,7 +36,7 @@ def fetch(country_code, search_params):
             #'search_terms': "''",
             #'search_page_ids': ,
             'ad_reached_countries': "['{}']".format(country_code),
-            'limit': 5000,
+            'limit': 1000,
             'access_token': creds.FB_TOKEN,
         }
         if after:
@@ -53,6 +53,7 @@ def fetch(country_code, search_params):
         assert set(json_data) <= {'data', 'paging'}, set(json_data)
 
         ads = json_data['data']
+        print('Got {} ads'.format(len(ads)))
 
         if 'paging' in json_data:
             paging = json_data['paging']
@@ -73,7 +74,7 @@ def fetch(country_code, search_params):
 
 
 def write_to_file(country_code='FR'):
-    ads = fetch(country_code=country_code, search_params={'search_terms': "''"})
+    ads = fetch(country_code=country_code, search_params={'search_terms': "''", 'ad_active_status': 'ALL'})
     
     filename_format = ROOT_DIR + '/data/ads-archive_' + country_code + '_{}.json'
 
