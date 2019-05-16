@@ -1,6 +1,7 @@
 import json
 import datetime
 import os
+import logging
 
 import requests
 
@@ -25,6 +26,36 @@ FIELDS = [
     'region_distribution',
     'spend',
 ]
+european_union_country_codes = [
+    'BE', # Belgium	
+    'EL', # Greece	
+    'LT', # Lithuania	
+    'PT', # Portugal
+    'BG', # Bulgaria	
+    'ES', # Spain	
+    'LU', # Luxembourg	
+    'RO', # Romania
+    'CZ', # Czechia	
+    'FR', # France	
+    'HU', # Hungary	
+    'SI', # Slovenia
+    'DK', # Denmark	
+    'HR', # Croatia	
+    'MT', # Malta	
+    'SK', # Slovakia
+    'DE', # Germany	
+    'IT', # Italy	
+    'NL', # Netherlands	
+    'FI', # Finland
+    'EE', # Estonia	
+    'CY', # Cyprus	
+    'AT', # Austria	
+    'SE', # Sweden
+    'IE', # Ireland	
+    'LV', # Latvia	
+    'PL', # Poland	
+    'UK', # United Kingdom
+]
 
 
 def fetch(country_code, search_params):
@@ -42,10 +73,15 @@ def fetch(country_code, search_params):
         if after:
             params['after'] = after
 
-        response = requests.get(
-            "https://graph.facebook.com/v3.3/ads_archive",
-            params=params,
-        )
+        response = None
+        while not response:
+            try:
+                response = requests.get(
+                    "https://graph.facebook.com/v3.3/ads_archive",
+                    params=params,
+                )
+            except:
+                logging.exception()
 
         assert response.status_code == 200, (response.status_code, response.text)
         json_data = response.json()
@@ -75,6 +111,8 @@ def fetch(country_code, search_params):
 
 def write_to_file(country_code='FR'):
     ads = fetch(country_code=country_code, search_params={'search_terms': "''", 'ad_active_status': 'ALL'})
+
+    print('Found {} ads.'.format(len(ads)))
     
     filename_format = ROOT_DIR + '/data/ads-archive_' + country_code + '_{}.json'
 
@@ -89,4 +127,6 @@ def write_to_file(country_code='FR'):
 
 
 if __name__ == '__main__':
-    write_to_file()
+    for country_code in european_union_country_codes:
+        print('Fetching ads for {}'.format(country_code))
+        write_to_file(country_code=country_code)
