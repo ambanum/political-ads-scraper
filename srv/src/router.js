@@ -1,5 +1,6 @@
 const fs = require('fs');
 const express = require('express');
+const { connectDatabase } = require('./database');
 
 
 const router = express.Router();
@@ -43,6 +44,35 @@ function randomSelect(array, n) {
 
     return array.slice(0, n);
 }
+
+// Sample request:
+// curl -X POST http://localhost:3003/ads/1254/annotation\?payload\=hello
+router.post('/ads/:adId/annotation', async function(req, res, next) {
+    try {
+        // Front-end data
+        const adId = req.params['adId'];
+        const payload = req.query.payload
+
+        // Back-end data
+        const timestamp = new Date().toISOString();
+        const contributorIP = req.ip;
+        const userAgent = req.headers['user-agent'];
+
+        const db = await connectDatabase();
+
+        await db.collection('annotations').insertOne({
+            adId,
+            payload,
+            timestamp,
+            contributorIP,
+            userAgent,
+        });
+
+        res.sendStatus(201);
+    } catch(e) {
+        return next(e);
+    }
+});
 
 
 module.exports = router;
