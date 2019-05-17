@@ -1,6 +1,8 @@
+require('dotenv').config();
 const fs = require('fs');
 const express = require('express');
 const { connectDatabase } = require('./database');
+const crypto = require('crypto');
 
 const router = express.Router();
 const FILE_NAME = __dirname + '/../../data/ads-archive_FR_latest.json';
@@ -54,8 +56,8 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
 
         // Back-end data
         const timestamp = new Date().toISOString();
-        const contributorIP = req.ip;
-        const userAgent = req.headers['user-agent'];
+        const contributorIP = crypto.createHmac('sha512', process.env.SALT).update(req.ip).digest("hex");
+        const userAgent = crypto.createHmac('sha512', process.env.SALT).update(req.headers['user-agent']).digest("hex");
 
         const db = await connectDatabase();
 
