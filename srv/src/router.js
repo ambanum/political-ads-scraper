@@ -1,20 +1,18 @@
 require('dotenv').config();
-const fs = require('fs');
 const express = require('express');
 const { connectDatabase } = require('./database');
 const crypto = require('crypto');
 
 const router = express.Router();
-const FILE_NAME = __dirname + '/../../data/ads-archive_FR_latest.json';
 
 router.get('/random', async function(req, res, next) {
     try {
-        var jsonData = fs.readFileSync(FILE_NAME, 'utf8');
-        const ads = JSON.parse(jsonData);
+        const nbAds = parseInt(req.query.nb_ads) || 20;
 
-        const nbAds = req.query.nb_ads || 20;
+        const db = await connectDatabase();
 
-        randomAds = randomSelect(ads, nbAds);
+        const cursor = await db.collection('ads').aggregate([{ '$sample': { size: nbAds } }]);
+        const randomAds = await cursor.toArray();
 
         res.json(randomAds);
     } catch(e) {
