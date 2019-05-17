@@ -2,7 +2,6 @@ const fs = require('fs');
 const express = require('express');
 const { connectDatabase } = require('./database');
 
-
 const router = express.Router();
 const FILE_NAME = __dirname + '/../../data/ads-archive_FR_latest.json';
 
@@ -23,7 +22,7 @@ router.get('/random', async function(req, res, next) {
 
 
 function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low)
+    return Math.floor(Math.random() * (high - low) + low);
 }
 
 
@@ -51,7 +50,7 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
     try {
         // Front-end data
         const adId = req.params['adId'];
-        const payload = req.query.payload
+        const payload = req.body;
 
         // Back-end data
         const timestamp = new Date().toISOString();
@@ -68,7 +67,9 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
             userAgent,
         });
 
-        res.sendStatus(201);
+        res.status(201).json({
+            id: adId
+        });
     } catch(e) {
         return next(e);
     }
