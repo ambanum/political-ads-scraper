@@ -27,34 +27,34 @@ FIELDS = [
     'spend',
 ]
 european_union_country_codes = [
-    'BE', # Belgium	
-    'EL', # Greece	
-    'LT', # Lithuania	
-    'PT', # Portugal
-    'BG', # Bulgaria	
-    'ES', # Spain	
-    'LU', # Luxembourg	
-    'RO', # Romania
-    'CZ', # Czechia	
-    'FR', # France	
-    'HU', # Hungary	
-    'SI', # Slovenia
-    'DK', # Denmark	
-    'HR', # Croatia	
-    'MT', # Malta	
-    'SK', # Slovakia
-    'DE', # Germany	
-    'IT', # Italy	
-    'NL', # Netherlands	
+    'AT', # Austria
+    'BE', # Belgium
+    'BG', # Bulgaria
+    'CY', # Cyprus
+    'CZ', # Czechia
+    'DE', # Germany
+    'DK', # Denmark
+    'EE', # Estonia
+    'ES', # Spain
     'FI', # Finland
-    'EE', # Estonia	
-    'CY', # Cyprus	
-    'AT', # Austria	
+    'FR', # France
+    'GR', # Greece
+    'HR', # Croatia
+    'HU', # Hungary
+    'IE', # Ireland
+    'IT', # Italy
+    'LT', # Lithuania
+    'LU', # Luxembourg
+    'LV', # Latvia
+    'MT', # Malta
+    'NL', # Netherlands
+    'PL', # Poland
+    'PT', # Portugal
+    'RO', # Romania
+    'SI', # Slovenia
     'SE', # Sweden
-    'IE', # Ireland	
-    'LV', # Latvia	
-    'PL', # Poland	
-    'UK', # United Kingdom
+    'SK', # Slovakia
+    'GB', # United Kingdom
 ]
 
 
@@ -67,21 +67,21 @@ def fetch(country_code, search_params):
             #'search_terms': "''",
             #'search_page_ids': ,
             'ad_reached_countries': "['{}']".format(country_code),
-            'limit': 1000,
+            'limit': 250,
             'access_token': creds.FB_TOKEN,
         }
         if after:
             params['after'] = after
 
-        response = None
-        while not response:
-            try:
-                response = requests.get(
+        #response = None
+        #while not response:
+        #    try:
+        response = requests.get(
                     "https://graph.facebook.com/v3.3/ads_archive",
                     params=params,
                 )
-            except:
-                logging.exception()
+        #    except:
+        #        logging.exception()
 
         assert response.status_code == 200, (response.status_code, response.text)
         json_data = response.json()
@@ -110,7 +110,10 @@ def fetch(country_code, search_params):
 
 
 def write_to_file(country_code='FR'):
-    ads = fetch(country_code=country_code, search_params={'search_terms': "''", 'ad_active_status': 'ALL'})
+    ads = fetch(
+        country_code=country_code,
+        search_params={'search_terms': "''", 'ad_active_status': 'ALL'},
+    )
 
     print('Found {} ads.'.format(len(ads)))
     
