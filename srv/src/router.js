@@ -4,10 +4,12 @@ const { connectDatabase } = require('./database');
 const crypto = require('crypto');
 
 const router = express.Router();
+const DEFAULT_NB_ADDS = 20;
+
 
 router.get('/random', async function(req, res, next) {
     try {
-        const nbAds = parseInt(req.query.nb_ads) || 20;
+        const nbAds = parseInt(req.query.nb_ads) || DEFAULT_NB_ADDS;
 
         const db = await connectDatabase();
 
@@ -20,29 +22,6 @@ router.get('/random', async function(req, res, next) {
     }
 });
 
-
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
-}
-
-
-function randomSelect(array, n) {
-    let i = 0,
-        j = 0,
-        temp;
-
-    while (i < n) {
-        j = randomInt(i, array.length);
-
-        temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-
-        i += 1;
-    }
-
-    return array.slice(0, n);
-}
 
 // Sample request:
 // curl -X POST http://localhost:3003/ads/1254/annotation\?payload\=hello
