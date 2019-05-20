@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { connectDatabase } = require('./database');
+const { getDatabase } = require('./database');
 const crypto = require('crypto');
 
 const router = express.Router();
@@ -11,9 +11,8 @@ router.get('/random', async function(req, res, next) {
     try {
         const nbAds = parseInt(req.query.nb_ads) || DEFAULT_NB_ADDS;
 
-        const db = await connectDatabase();
-
-        const cursor = await db.collection('ads').aggregate([{ '$sample': { size: nbAds } }]);
+        adsTable = getDatabase().collection('ads');
+        const cursor = await adsTable.aggregate([{ '$sample': { size: nbAds } }]);
         const randomAds = await cursor.toArray();
 
         res.json(randomAds);
@@ -36,9 +35,8 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
         const contributorIP = crypto.createHmac('sha512', process.env.SALT).update(req.ip).digest("hex");
         const userAgent = crypto.createHmac('sha512', process.env.SALT).update(req.headers['user-agent']).digest("hex");
 
-        const db = await connectDatabase();
-
-        await db.collection('annotations').insertOne({
+        annotationTable = getDatabase().collection('annotations');
+        await annotationTable.insertOne({
             adId,
             payload,
             timestamp,
