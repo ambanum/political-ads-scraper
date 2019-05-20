@@ -16,7 +16,7 @@ from pymongo import MongoClient
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
-with open(ROOT_DIR + '/data/ads-archive_FR_latest.json') as f:
+with open(ROOT_DIR + '/data/FR/facebook-ads-archive_FR_latest.json') as f:
     ads = json.load(f)
 
 print('Loaded {} ads'.format(len(ads)))

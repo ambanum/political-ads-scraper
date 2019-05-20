@@ -26,39 +26,39 @@ FIELDS = [
     'region_distribution',
     'spend',
 ]
-european_union_country_codes = [
-    'AT', # Austria
-    'BE', # Belgium
-    'BG', # Bulgaria
-    'CY', # Cyprus
-    'CZ', # Czechia
-    'DE', # Germany
-    'DK', # Denmark
-    'EE', # Estonia
-    'ES', # Spain
-    'FI', # Finland
-    'FR', # France
-    'GR', # Greece
-    'HR', # Croatia
-    'HU', # Hungary
-    'IE', # Ireland
-    'IT', # Italy
-    'LT', # Lithuania
-    'LU', # Luxembourg
-    'LV', # Latvia
-    'MT', # Malta
-    'NL', # Netherlands
-    'PL', # Poland
-    'PT', # Portugal
-    'RO', # Romania
-    'SI', # Slovenia
-    'SE', # Sweden
-    'SK', # Slovakia
-    'GB', # United Kingdom
+european_union_countries = [
+    ('AT', 250), # Austria
+    ('BE', 250), # Belgium
+    ('BG', 250), # Bulgaria
+    ('CY', 250), # Cyprus
+    ('CZ', 250), # Czechia
+    ('DE', 1000), # Germany
+    ('DK', 250), # Denmark
+    ('EE', 250), # Estonia
+    ('ES', 250), # Spain
+    ('FI', 250), # Finland
+    ('FR', 250), # France
+    ('GR', 250), # Greece
+    ('HR', 250), # Croatia
+    ('HU', 250), # Hungary
+    ('IE', 250), # Ireland
+    ('IT', 250), # Italy
+    ('LT', 250), # Lithuania
+    ('LU', 250), # Luxembourg
+    ('LV', 250), # Latvia
+    ('MT', 250), # Malta
+    ('NL', 250), # Netherlands
+    ('PL', 250), # Poland
+    ('PT', 250), # Portugal
+    ('RO', 250), # Romania
+    ('SI', 250), # Slovenia
+    ('SE', 250), # Sweden
+    ('SK', 250), # Slovakia
+    ('GB', 250), # United Kingdom
 ]
 
 
-def fetch(country_code, search_params):
+def fetch(country_code, search_params, limit=250):
     def make_request(after=None):
         params = {
             # 'ad-type': 'POLITICAL_AND_ISSUE_ADS' (default)
@@ -67,7 +67,7 @@ def fetch(country_code, search_params):
             #'search_terms': "''",
             #'search_page_ids': ,
             'ad_reached_countries': "['{}']".format(country_code),
-            'limit': 250,
+            'limit': limit,
             'access_token': creds.FB_TOKEN,
         }
         if after:
@@ -109,27 +109,28 @@ def fetch(country_code, search_params):
     return ads
 
 
-def write_to_file(country_code='FR'):
+def write_to_file(country_code='FR', limit=250):
     ads = fetch(
         country_code=country_code,
         search_params={'search_terms': "''", 'ad_active_status': 'ALL'},
+        limit=limit,
     )
 
     print('Found {} ads.'.format(len(ads)))
     
-    filename_format = ROOT_DIR + '/data/ads-archive_' + country_code + '_{}.json'
+    filename_format = ROOT_DIR + '/data/' + country_code + '/facebook-ads-archive_' + country_code + '_{}.json'
 
     filename_date = filename_format.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-    filename_latest = filename_format.format('latest')
+    #filename_latest = filename_format.format('latest')
 
     with open(filename_date, 'w') as outfile:
         json.dump(ads, outfile)
 
-    with open(filename_latest, 'w') as outfile:
-        json.dump(ads, outfile)
-
+def create_dirs():
+    for country_code, _ in european_union_countries:
+        os.mkdir('data/' + country_code)
 
 if __name__ == '__main__':
-    for country_code in european_union_country_codes:
+    for country_code, limit in european_union_countries:
         print('Fetching ads for {}'.format(country_code))
-        write_to_file(country_code=country_code)
+        write_to_file(country_code=country_code, limit=limit)
