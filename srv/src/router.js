@@ -1,17 +1,18 @@
 require('dotenv').config();
 const express = require('express');
-const { connectDatabase } = require('./database');
+const { getDatabase } = require('./database');
 const crypto = require('crypto');
 
 const router = express.Router();
+const DEFAULT_NB_ADDS = 20;
+
 
 router.get('/random', async function(req, res, next) {
     try {
-        const nbAds = parseInt(req.query.nb_ads) || 20;
+        const nbAds = parseInt(req.query.nb_ads) || DEFAULT_NB_ADDS;
 
-        const db = await connectDatabase();
-
-        const cursor = await db.collection('ads').aggregate([{ '$sample': { size: nbAds } }]);
+        adsTable = getDatabase().collection('ads');
+        const cursor = await adsTable.aggregate([{ '$sample': { size: nbAds } }]);
         const randomAds = await cursor.toArray();
 
         res.json(randomAds);
@@ -21,31 +22,8 @@ router.get('/random', async function(req, res, next) {
 });
 
 
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
-}
-
-
-function randomSelect(array, n) {
-    let i = 0,
-        j = 0,
-        temp;
-
-    while (i < n) {
-        j = randomInt(i, array.length);
-
-        temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-
-        i += 1;
-    }
-
-    return array.slice(0, n);
-}
-
 // Sample request:
-// curl -X POST http://localhost:3003/ads/1254/annotation\?payload\=hello
+// curl -X POST http://localhost:3003/ads/1254/annotation --header "Content-Type: application/json" --data '{"value": "hello"}'
 router.post('/ads/:adId/annotation', async function(req, res, next) {
     try {
         // Front-end data
@@ -57,9 +35,8 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
         const contributorIP = crypto.createHmac('sha512', process.env.SALT).update(req.ip).digest("hex");
         const userAgent = crypto.createHmac('sha512', process.env.SALT).update(req.headers['user-agent']).digest("hex");
 
-        const db = await connectDatabase();
-
-        await db.collection('annotations').insertOne({
+        annotationTable = getDatabase().collection('annotations');
+        await annotationTable.insertOne({
             adId,
             payload,
             timestamp,
