@@ -1,5 +1,13 @@
-## Run
+## Run during developpement
 
 ```
-NODE_ENV=development npm start
+NODE_ENV=development SALT=abc npm start
+```
+
+## Run in production
+
+Create a file `srv/.env`:
+
+```
+SALT="abc"
 ```

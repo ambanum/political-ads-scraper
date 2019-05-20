@@ -23,7 +23,7 @@ router.get('/random', async function(req, res, next) {
 
 
 // Sample request:
-// curl -X POST http://localhost:3003/ads/1254/annotation\?payload\=hello
+// curl -X POST http://localhost:3003/ads/1254/annotation --header "Content-Type: application/json" --data '{"value": "hello"}'
 router.post('/ads/:adId/annotation', async function(req, res, next) {
     try {
         // Front-end data
