@@ -5,7 +5,7 @@ import logging
 
 import requests
 
-import creds
+import config
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 FIELDS = [
@@ -58,7 +58,18 @@ european_union_countries = [
 ]
 
 
-def fetch(country_code, search_params, limit=250):
+def get_fb_token():
+    response = requests.get(
+        config.FB_TOKEN_SERVICE_URL,
+        params={
+            'shared_secret': config.FB_TOKEN_SERVICE_SECRET,
+        },
+    )
+    response.raise_for_status()
+    return response.text.strip()
+
+
+def fetch(fb_token, country_code, search_params, limit=250):
     def make_request(after=None):
         params = {
             # 'ad-type': 'POLITICAL_AND_ISSUE_ADS' (default)
@@ -68,7 +79,7 @@ def fetch(country_code, search_params, limit=250):
             #'search_page_ids': ,
             'ad_reached_countries': "['{}']".format(country_code),
             'limit': limit,
-            'access_token': creds.FB_TOKEN,
+            'access_token': fb_token,
         }
         if after:
             params['after'] = after
@@ -109,8 +120,9 @@ def fetch(country_code, search_params, limit=250):
     return ads
 
 
-def write_to_file(country_code='FR', limit=250):
+def write_to_file(fb_token, country_code='FR', limit=250):
     ads = fetch(
+        fb_token=fb_token,
         country_code=country_code,
         search_params={'search_terms': "''", 'ad_active_status': 'ALL'},
         limit=limit,
@@ -131,6 +143,11 @@ def create_dirs():
         os.mkdir('data/' + country_code)
 
 if __name__ == '__main__':
+    fb_token = get_fb_token()
     for country_code, limit in european_union_countries:
         print('Fetching ads for {}'.format(country_code))
-        write_to_file(country_code=country_code, limit=limit)
+        write_to_file(
+            fb_token=fb_token,
+            country_code=country_code,
+            limit=limit,
+        )
