@@ -1,4 +1,6 @@
 creds.py
+credentials.py
+config.py
 
 .ipynb_checkpoints
 __pycache__
