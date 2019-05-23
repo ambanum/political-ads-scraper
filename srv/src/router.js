@@ -7,6 +7,22 @@ const router = express.Router();
 const DEFAULT_NB_ADDS = 20;
 
 
+router.get('/counts', async function (req, res, next) {
+    try {
+        const nbAds = parseInt(req.query.nb_ads) || DEFAULT_NB_ADDS;
+
+        const adsCount = await getDatabase().collection('ads').count();
+        const annotationsCount = await getDatabase().collection('annotations').count();
+
+        res.json({
+            adsCount,
+            annotationsCount,
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+
 router.get('/random', async function(req, res, next) {
     try {
         const nbAds = parseInt(req.query.nb_ads) || DEFAULT_NB_ADDS;
