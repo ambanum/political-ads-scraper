@@ -55,6 +55,7 @@ def get_snapshot_data(user_access_token, browser, ad_id):
                 'markup': data['markup'],
                 'require': data['require'],
             },
+            'react_component': react_component,
             'media': {
                 'images': original_snapshot_data['images'],
                 'videos': original_snapshot_data['videos'],
