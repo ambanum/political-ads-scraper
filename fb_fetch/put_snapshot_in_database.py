@@ -1,3 +1,7 @@
+"""
+ssh -NT -L 27018:localhost:27017 cloud@desinfo.quaidorsay.fr
+"""
+
 
 import time
 
