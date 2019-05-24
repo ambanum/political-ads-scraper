@@ -5,7 +5,7 @@ import pyotp
 import requests
 import mechanize
 
-import credentials
+from fb_fetch import config
 
 
 def inspect_token(token):
@@ -29,7 +29,8 @@ def test_token(token):
             'ad_reached_countries': "['FR']",
             'limit': 1,
             'access_token': token,
-    })
+        }
+    )
     assert response.status_code == 200, (response.status_code, response.text)
     assert len(response.json()['data']) == 1
     print('Token is OK')
@@ -40,8 +41,8 @@ def try_app_token():
     response = requests.get(
         "https://graph.facebook.com/v3.3/oauth/access_token",
         params={
-            'client_id': credentials.APP_ID,
-            'client_secret': credentials.APP_SECRET,
+            'client_id': config.APP_ID,
+            'client_secret': config.APP_SECRET,
             'grant_type': 'client_credentials',
         },
     )
@@ -53,7 +54,7 @@ def try_app_token():
     test_token(app_token)
 
 
-def get_user_token():
+def connect_facebook():
     # Setup browser
     browser = mechanize.Browser()
     cookies = http.cookiejar.LWPCookieJar()
@@ -70,12 +71,12 @@ def get_user_token():
     url = 'https://m.facebook.com/login.php'
     browser.open(url)
     browser.select_form(nr=0)
-    browser.form['email'] = credentials.FB_USER
-    browser.form['pass'] = credentials.FB_PASSWORD
+    browser.form['email'] = config.FB_USER
+    browser.form['pass'] = config.FB_PASSWORD
     browser.submit()
 
     # 2FA
-    totp = pyotp.TOTP(credentials.TOTP_SECRET)
+    totp = pyotp.TOTP(config.TOTP_SECRET)
     browser.select_form(nr=0)
     browser.form['approvals_code'] = totp.now()
     browser.submit()
@@ -83,8 +84,12 @@ def get_user_token():
     # Do not remember browser
     browser.select_form(nr=0)
     browser.form['name_action_selected'] = ['dont_save']
-    response = browser.submit()
+    browser.submit()
 
+    return browser
+
+
+def get_user_token(browser):
     #print(response.read())
     #print(cookies)
 
@@ -98,7 +103,7 @@ def get_user_token():
 
     browser.set_handle_redirect(False)
     params = urllib.parse.urlencode({
-        'client_id': credentials.APP_ID,
+        'client_id': config.APP_ID,
         # Make sure to define this url in facebook app's parameters (product login/parameters)
         # This callback does not have to be implemented, because the redirection is caught
         'redirect_uri': 'https://desinfo.quaidorsay.fr/api/ads/1.0/callback',
@@ -108,7 +113,7 @@ def get_user_token():
     url = 'https://www.facebook.com/v3.3/dialog/oauth?' + params
 
     try:
-        response = browser.open(url)
+        browser.open(url)
     except urllib.error.HTTPError as response:
         redirect_location = response.headers['Location']
 
@@ -116,3 +121,9 @@ def get_user_token():
     user_access_token = urllib.parse.parse_qs(fragment)['access_token'][0]
 
     return user_access_token
+
+
+def connect_and_get_user_token():
+    browser = connect_facebook()
+    user_access_token = get_user_token(browser)
+    return user_access_token, browser

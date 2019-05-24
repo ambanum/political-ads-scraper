@@ -4,7 +4,10 @@ config.py
 
 .ipynb_checkpoints
 __pycache__
+*.egg-info
 
 data
 
 node_modules
+
+.vscode

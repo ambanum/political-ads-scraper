@@ -2,10 +2,11 @@ import json
 import datetime
 import os
 import logging
+import re
 
 import requests
 
-import config
+from fb_fetch import config
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 FIELDS = [
@@ -68,6 +69,9 @@ def get_fb_token():
     response.raise_for_status()
     return response.text.strip()
 
+AD_ID_REGEX = re.compile(r'^https://www\.facebook\.com/ads/archive/render_ad/\?id=(\d+)&access_token=[a-zA-Z0-9]+$')
+def get_ad_id(ad):
+    return AD_ID_REGEX.match(ad['ad_snapshot_url']).groups()[0]
 
 def fetch(fb_token, country_code, search_params, limit=250):
     def make_request(after=None):

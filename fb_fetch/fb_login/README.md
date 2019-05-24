@@ -1,5 +1,5 @@
 
-## Get FB user token
+## Serve FB user token
 
 ```
 tmux new -s fbtoken
