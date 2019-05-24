@@ -5,7 +5,7 @@ import pyotp
 import requests
 import mechanize
 
-import creds
+import credentials
 
 
 def inspect_token(token):
@@ -40,8 +40,8 @@ def try_app_token():
     response = requests.get(
         "https://graph.facebook.com/v3.3/oauth/access_token",
         params={
-            'client_id': creds.APP_ID,
-            'client_secret': creds.APP_SECRET,
+            'client_id': credentials.APP_ID,
+            'client_secret': credentials.APP_SECRET,
             'grant_type': 'client_credentials',
         },
     )
@@ -70,12 +70,12 @@ def get_user_token():
     url = 'https://m.facebook.com/login.php'
     browser.open(url)
     browser.select_form(nr=0)
-    browser.form['email'] = creds.FB_USER
-    browser.form['pass'] = creds.FB_PASSWORD
+    browser.form['email'] = credentials.FB_USER
+    browser.form['pass'] = credentials.FB_PASSWORD
     browser.submit()
 
     # 2FA
-    totp = pyotp.TOTP(creds.TOTP_SECRET)
+    totp = pyotp.TOTP(credentials.TOTP_SECRET)
     browser.select_form(nr=0)
     browser.form['approvals_code'] = totp.now()
     browser.submit()
@@ -98,7 +98,7 @@ def get_user_token():
 
     browser.set_handle_redirect(False)
     params = urllib.parse.urlencode({
-        'client_id': creds.APP_ID,
+        'client_id': credentials.APP_ID,
         # Make sure to define this url in facebook app's parameters (product login/parameters)
         # This callback does not have to be implemented, because the redirection is caught
         'redirect_uri': 'https://desinfo.quaidorsay.fr/api/ads/1.0/callback',
@@ -113,6 +113,6 @@ def get_user_token():
         redirect_location = response.headers['Location']
 
     fragment = urllib.parse.urlparse(redirect_location).fragment
-    user_access_token = urllib.parse.parse_qs(fragment)['access_token']
+    user_access_token = urllib.parse.parse_qs(fragment)['access_token'][0]
 
     return user_access_token
