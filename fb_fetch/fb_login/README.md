@@ -37,5 +37,5 @@ FB_USER = 'xxx'
 FB_PASSWORD = 'xxx'
 TOTP_SECRET = 'xxx'
 
-SHARED_SECRET = 'xxx'
+FB_TOKEN_SERVICE_SECRET = 'xxx'
 ```
