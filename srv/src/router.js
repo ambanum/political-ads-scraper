@@ -37,10 +37,7 @@ router.get('/random', async function(req, res, next) {
     }
 });
 
-
-// Sample request:
-// curl -X POST http://localhost:3003/ads/1254/annotation --header "Content-Type: application/json" --data '{"value": "hello"}'
-router.post('/ads/:adId/annotation', async function(req, res, next) {
+async function annotate(req, res, next) {
     try {
         // Front-end data
         const adId = req.params['adId'];
@@ -63,10 +60,19 @@ router.post('/ads/:adId/annotation', async function(req, res, next) {
         res.status(201).json({
             id: adId
         });
-    } catch(e) {
+    } catch (e) {
         return next(e);
     }
-});
+}
+
+
+
+//deprecatde route
+router.post('/ads/:adId/annotation', annotate);
+
+// Sample request:
+// curl -X POST http://localhost:3003/ads/1254/annotation --header "Content-Type: application/json" --data '{"value": "hello"}'
+router.post('/political-ads/:adId/annotation', annotate);
 
 
 module.exports = router;
