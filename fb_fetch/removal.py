@@ -45,6 +45,7 @@ def compare_ad_lists(ads_old, ads_new):
     assert len(new_only_ids) + len(both_ids) == len(new_ids)
     assert len(old_only_ids) + len(both_ids) == len(old_ids)
 
+    print('{} ads have been added.'.format(len(new_only_ids)))
     print('{} ads have been removed.'.format(len(old_only_ids)))
     print()
     print('='*80)
@@ -91,5 +92,6 @@ if __name__ == '__main__':
 Usage:
 > python fb_fetch/removal/py data/FR/facebook-ads-archive_FR_2019-05-16_20-37-43.json data/FR/facebook-ads-archive_FR_2019-05-20_14-03-03.json
 """)
+        exit()
 
     main(filename_old=sys.argv[1], filename_new=sys.argv[2])
