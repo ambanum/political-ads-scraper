@@ -30,34 +30,34 @@ FIELDS = [
     'spend',
 ]
 COUNTRIES = [
-#    {'code': 'AT', 'page_size': 250}, # Austria
-#    {'code': 'BE', 'page_size': 250}, # Belgium
-#    {'code': 'BG', 'page_size': 250}, # Bulgaria
-#    {'code': 'CY', 'page_size': 250}, # Cyprus
-#    {'code': 'CZ', 'page_size': 250}, # Czechia
-#    {'code': 'DE', 'page_size': 1000}, # Germany
-#    {'code': 'DK', 'page_size': 250}, # Denmark
-#    {'code': 'EE', 'page_size': 250}, # Estonia
-#    {'code': 'ES', 'page_size': 250}, # Spain
-#    {'code': 'FI', 'page_size': 250}, # Finland
-#    {'code': 'FR', 'page_size': 250}, # France
-#    {'code': 'GR', 'page_size': 250}, # Greece
-#    {'code': 'HR', 'page_size': 250}, # Croatia
-#    {'code': 'HU', 'page_size': 250}, # Hungary
-#    {'code': 'IE', 'page_size': 250}, # Ireland
-#    {'code': 'IT', 'page_size': 250}, # Italy
-#    {'code': 'LT', 'page_size': 250}, # Lithuania
-#    {'code': 'LU', 'page_size': 250}, # Luxembourg
-#    {'code': 'LV', 'page_size': 250}, # Latvia
-#    {'code': 'MT', 'page_size': 250}, # Malta
-#    {'code': 'NL', 'page_size': 250}, # Netherlands
-#    {'code': 'PL', 'page_size': 250}, # Poland
-#    {'code': 'PT', 'page_size': 250}, # Portugal
-#    {'code': 'RO', 'page_size': 250}, # Romania
-#    {'code': 'SI', 'page_size': 250}, # Slovenia
-#    {'code': 'SE', 'page_size': 250}, # Sweden
-#    {'code': 'SK', 'page_size': 250}, # Slovakia
-#    {'code': 'GB', 'page_size': 250}, # United Kingdom
+    {'code': 'AT', 'page_size': 250}, # Austria
+    {'code': 'BE', 'page_size': 250}, # Belgium
+    {'code': 'BG', 'page_size': 250}, # Bulgaria
+    {'code': 'CY', 'page_size': 250}, # Cyprus
+    {'code': 'CZ', 'page_size': 250}, # Czechia
+    {'code': 'DE', 'page_size': 1000}, # Germany
+    {'code': 'DK', 'page_size': 250}, # Denmark
+    {'code': 'EE', 'page_size': 250}, # Estonia
+    {'code': 'ES', 'page_size': 250}, # Spain
+    {'code': 'FI', 'page_size': 250}, # Finland
+    {'code': 'FR', 'page_size': 250}, # France
+    {'code': 'GR', 'page_size': 250}, # Greece
+    {'code': 'HR', 'page_size': 250}, # Croatia
+    {'code': 'HU', 'page_size': 250}, # Hungary
+    {'code': 'IE', 'page_size': 250}, # Ireland
+    {'code': 'IT', 'page_size': 250}, # Italy
+    {'code': 'LT', 'page_size': 250}, # Lithuania
+    {'code': 'LU', 'page_size': 250}, # Luxembourg
+    {'code': 'LV', 'page_size': 250}, # Latvia
+    {'code': 'MT', 'page_size': 250}, # Malta
+    {'code': 'NL', 'page_size': 250}, # Netherlands
+    {'code': 'PL', 'page_size': 250}, # Poland
+    {'code': 'PT', 'page_size': 250}, # Portugal
+    {'code': 'RO', 'page_size': 250}, # Romania
+    {'code': 'SI', 'page_size': 250}, # Slovenia
+    {'code': 'SE', 'page_size': 250}, # Sweden
+    {'code': 'SK', 'page_size': 250}, # Slovakia
+    {'code': 'GB', 'page_size': 250}, # United Kingdom
     {'code': 'US', 'page_size': 2000}, # United States of America
 ]
 
@@ -120,7 +120,6 @@ def fetch(fb_token, country_code, page_size=250):
         assert set(json_data) <= {'data', 'paging'}, set(json_data)
 
         ads = json_data['data']
-        ads = ['hey']*len(ads) #TODO remove
         print('{} Got {} ads'.format(datetime.datetime.now(), len(ads)))
 
         if 'paging' in json_data:
