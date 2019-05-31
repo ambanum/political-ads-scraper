@@ -54,7 +54,7 @@ def fetch_endpoint(endpoint, date, country_code, time_preset=None):
 
     response = None
     nb_retry = 0
-    while not response ans nb_retry < 3:
+    while not response and nb_retry < 3:
         try:
             response = requests.post(
                 url,
