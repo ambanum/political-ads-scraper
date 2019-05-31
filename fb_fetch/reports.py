@@ -132,4 +132,4 @@ def init(start_date):
 
 if __name__ == '__main__':
     today = datetime.date.today()
-    fetch_for_date_country(today=today)
+    fetch_for_date(today=today)
