@@ -129,15 +129,29 @@ def fetch(fb_token, country_code, page_size=250):
     return ads
 
 
-def write_to_file(fb_token, country_code='FR', page_size=250):
-    ads = fetch(
-        fb_token=fb_token,
-        country_code=country_code,
-        page_size=page_size,
-    )
+def write_to_file(country_code='FR', page_size=250):
+    ads = None
+    nb_retry = 0
+    while not ads and nb_retry < 3:
+        try:
+            nb_retry += 1
 
-    print('Found {} ads.'.format(len(ads)))
-    
+            fb_token = get_fb_token()
+
+            ads = fetch(
+                fb_token=fb_token,
+                country_code=country_code,
+                page_size=page_size,
+            )
+
+            print('Found {} ads.'.format(len(ads)))
+        except:
+            logging.exception('Fetch failed')
+
+    if not ads:
+        print('Could not fetch ads for country {}'.format(country_code))
+        return
+
     filename_format = ROOT_DIR + '/data/' + country_code + '/facebook-ads-archive_' + country_code + '_{}.json'
 
     filename_date = filename_format.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
@@ -151,11 +165,9 @@ def create_dirs():
         os.mkdir('data/' + country['code'])
 
 if __name__ == '__main__':
-    fb_token = get_fb_token()
     for country in european_union_countries:
         print('Fetching ads for {}'.format(country['code']))
         write_to_file(
-            fb_token=fb_token,
             country_code=country['code'],
             page_size=country['page_size'],
         )
