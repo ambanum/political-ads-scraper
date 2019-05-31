@@ -52,12 +52,25 @@ def fetch_endpoint(endpoint, date, country_code, time_preset=None):
     else:
         raise ValueError('Unknown endpoint')
 
-    response = requests.post(
-        url,
-        headers=FORM_HEADERS,
-        data=FORM_DATA
-    )
-    response.raise_for_status()
+    response = None
+    nb_retry = 0
+    while not response ans nb_retry < 3:
+        try:
+            response = requests.post(
+                url,
+                headers=FORM_HEADERS,
+                data=FORM_DATA
+            )
+            response.raise_for_status()
+
+        except Exception as exception:
+            logging.exception('Request failed')
+            if exception.__class__.__name__ == 'KeyboardInterrupt':
+                raise
+            time.sleep(60)
+
+    if not response:
+        assert False
 
     prefix = 'for (;;);'
     assert response.text[:len(prefix)] == prefix
