@@ -3,6 +3,7 @@ import datetime
 import os
 import logging
 import re
+import time
 
 import requests
 
@@ -27,35 +28,36 @@ FIELDS = [
     'region_distribution',
     'spend',
 ]
-european_union_countries = [
-    {'code': 'AT', 'page_size': 250}, # Austria
-    {'code': 'BE', 'page_size': 250}, # Belgium
-    {'code': 'BG', 'page_size': 250}, # Bulgaria
-    {'code': 'CY', 'page_size': 250}, # Cyprus
-    {'code': 'CZ', 'page_size': 250}, # Czechia
-    {'code': 'DE', 'page_size': 1000}, # Germany
-    {'code': 'DK', 'page_size': 250}, # Denmark
-    {'code': 'EE', 'page_size': 250}, # Estonia
-    {'code': 'ES', 'page_size': 250}, # Spain
-    {'code': 'FI', 'page_size': 250}, # Finland
-    {'code': 'FR', 'page_size': 250}, # France
-    {'code': 'GR', 'page_size': 250}, # Greece
-    {'code': 'HR', 'page_size': 250}, # Croatia
-    {'code': 'HU', 'page_size': 250}, # Hungary
-    {'code': 'IE', 'page_size': 250}, # Ireland
-    {'code': 'IT', 'page_size': 250}, # Italy
-    {'code': 'LT', 'page_size': 250}, # Lithuania
-    {'code': 'LU', 'page_size': 250}, # Luxembourg
-    {'code': 'LV', 'page_size': 250}, # Latvia
-    {'code': 'MT', 'page_size': 250}, # Malta
-    {'code': 'NL', 'page_size': 250}, # Netherlands
-    {'code': 'PL', 'page_size': 250}, # Poland
-    {'code': 'PT', 'page_size': 250}, # Portugal
-    {'code': 'RO', 'page_size': 250}, # Romania
-    {'code': 'SI', 'page_size': 250}, # Slovenia
-    {'code': 'SE', 'page_size': 250}, # Sweden
-    {'code': 'SK', 'page_size': 250}, # Slovakia
-    {'code': 'GB', 'page_size': 250}, # United Kingdom
+COUNTRIES = [
+#    {'code': 'AT', 'page_size': 250}, # Austria
+#    {'code': 'BE', 'page_size': 250}, # Belgium
+#    {'code': 'BG', 'page_size': 250}, # Bulgaria
+#    {'code': 'CY', 'page_size': 250}, # Cyprus
+#    {'code': 'CZ', 'page_size': 250}, # Czechia
+#    {'code': 'DE', 'page_size': 1000}, # Germany
+#    {'code': 'DK', 'page_size': 250}, # Denmark
+#    {'code': 'EE', 'page_size': 250}, # Estonia
+#    {'code': 'ES', 'page_size': 250}, # Spain
+#    {'code': 'FI', 'page_size': 250}, # Finland
+#    {'code': 'FR', 'page_size': 250}, # France
+#    {'code': 'GR', 'page_size': 250}, # Greece
+#    {'code': 'HR', 'page_size': 250}, # Croatia
+#    {'code': 'HU', 'page_size': 250}, # Hungary
+#    {'code': 'IE', 'page_size': 250}, # Ireland
+#    {'code': 'IT', 'page_size': 250}, # Italy
+#    {'code': 'LT', 'page_size': 250}, # Lithuania
+#    {'code': 'LU', 'page_size': 250}, # Luxembourg
+#    {'code': 'LV', 'page_size': 250}, # Latvia
+#    {'code': 'MT', 'page_size': 250}, # Malta
+#    {'code': 'NL', 'page_size': 250}, # Netherlands
+#    {'code': 'PL', 'page_size': 250}, # Poland
+#    {'code': 'PT', 'page_size': 250}, # Portugal
+#    {'code': 'RO', 'page_size': 250}, # Romania
+#    {'code': 'SI', 'page_size': 250}, # Slovenia
+#    {'code': 'SE', 'page_size': 250}, # Sweden
+#    {'code': 'SK', 'page_size': 250}, # Slovakia
+#    {'code': 'GB', 'page_size': 250}, # United Kingdom
+    {'code': 'US', 'page_size': 2000}, # United States of America
 ]
 
 
@@ -91,25 +93,34 @@ def fetch(fb_token, country_code, page_size=250):
             params['after'] = after
 
         response = None
-        while not response:
+        nb_retry = 0
+        while not response and nb_retry < 3:
             try:
+                nb_retry += 1
+
                 response = requests.get(
                     ADS_API_URL,
                     params=params,
                     timeout=60,
                 )
+
+                assert response.status_code == 200, (response.status_code, response.text)
+
             except Exception as exception:
-                logging.exception('')
+                logging.exception('Request failed')
                 if exception.__class__.__name__ == 'KeyboardInterrupt':
                     raise
+                time.sleep(60)
 
-        assert response.status_code == 200, (response.status_code, response.text)
+        assert response
+
         json_data = response.json()
 
         assert set(json_data) <= {'data', 'paging'}, set(json_data)
 
         ads = json_data['data']
-        print('Got {} ads'.format(len(ads)))
+        ads = ['hey']*len(ads) #TODO remove
+        print('{} Got {} ads'.format(datetime.datetime.now(), len(ads)))
 
         if 'paging' in json_data:
             paging = json_data['paging']
@@ -145,8 +156,11 @@ def write_to_file(country_code='FR', page_size=250):
             )
 
             print('Found {} ads.'.format(len(ads)))
-        except:
+        except Exception as exception:
+            print('{} Fetch failed'.format(datetime.datetime.now()))
             logging.exception('Fetch failed')
+            if exception.__class__.__name__ == 'KeyboardInterrupt':
+                raise
 
     if not ads:
         print('Could not fetch ads for country {}'.format(country_code))
@@ -161,11 +175,11 @@ def write_to_file(country_code='FR', page_size=250):
         json.dump(ads, outfile)
 
 def create_dirs():
-    for country_code in european_union_countries:
+    for country_code in COUNTRIES:
         os.mkdir('data/' + country['code'])
 
 if __name__ == '__main__':
-    for country in european_union_countries:
+    for country in COUNTRIES:
         print('Fetching ads for {}'.format(country['code']))
         write_to_file(
             country_code=country['code'],
