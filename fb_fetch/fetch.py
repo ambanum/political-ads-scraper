@@ -61,23 +61,39 @@ COUNTRIES = [
     {'code': 'US', 'page_size': 2000}, # United States of America
 ]
 
+class FacebookToken():
+    _delay = datetime.timedelta(0, 30*60) # 30 minutes
 
-def get_fb_token():
-    response = requests.get(
-        config.FB_TOKEN_SERVICE_URL,
-        params={
-            'shared_secret': config.FB_TOKEN_SERVICE_SECRET,
-        },
-    )
-    response.raise_for_status()
-    return response.text.strip()
+    def __init__(self):
+        self._timestamp = None
+        self._token = None
+
+    def _renew_token(self):
+        new_timestamp = datetime.datetime.now()
+        response = requests.get(
+            config.FB_TOKEN_SERVICE_URL,
+            params={
+                'shared_secret': config.FB_TOKEN_SERVICE_SECRET,
+            },
+        )
+        response.raise_for_status()
+
+        self._timestamp = new_timestamp
+        self._token = response.text.strip()
+
+    @property
+    def token(self):
+        if not self._timestamp or (datetime.datetime.now() - self._timestamp > self._delay):
+            self._renew_token()
+        return self._token        
+
 
 AD_ID_REGEX = re.compile(r'^https://www\.facebook\.com/ads/archive/render_ad/\?id=(\d+)&access_token=[a-zA-Z0-9]+$')
 def get_ad_id(ad):
     return AD_ID_REGEX.match(ad['ad_snapshot_url']).groups()[0]
 
-def fetch(fb_token, country_code, page_size=250):
-    def make_request(after=None):
+def fetch(country_code, page_size, token):
+    def make_request(token_value, after=None):
         ADS_API_URL = "https://graph.facebook.com/v3.3/ads_archive"
 
         params = {
@@ -88,7 +104,7 @@ def fetch(fb_token, country_code, page_size=250):
             #'search_page_ids': ,
             'ad_reached_countries': "['{}']".format(country_code),
             'limit': page_size,
-            'access_token': fb_token,
+            'access_token': token_value,
         }
         if after:
             params['after'] = after
@@ -122,6 +138,10 @@ def fetch(fb_token, country_code, page_size=250):
         ads = json_data['data']
         print('{} Got {} ads'.format(datetime.datetime.now(), len(ads)))
 
+        if country_code == 'US':
+            # We don't keep US ads (there are way too many)
+            ads = [None] * len(ads)
+
         if 'paging' in json_data:
             paging = json_data['paging']
             assert set(paging) <= {'cursors', 'next', 'previous'}, paging
@@ -132,27 +152,25 @@ def fetch(fb_token, country_code, page_size=250):
 
         return ads, after
 
-    ads, after = make_request()
+    ads, after = make_request(token_value=token.token)
     while(after):
-        ads_batch, after = make_request(after=after)
+        ads_batch, after = make_request(token_value=token.token, after=after)
         ads += ads_batch
 
     return ads
 
 
-def write_to_file(country_code='FR', page_size=250):
+def write_to_file(country_code, page_size, token):
     ads = None
     nb_retry = 0
     while not ads and nb_retry < 3:
         try:
             nb_retry += 1
 
-            fb_token = get_fb_token()
-
             ads = fetch(
-                fb_token=fb_token,
                 country_code=country_code,
                 page_size=page_size,
+                token=token,
             )
 
             print('Found {} ads.'.format(len(ads)))
@@ -184,9 +202,12 @@ def create_dirs():
 
 
 if __name__ == '__main__':
+    token = FacebookToken()
+
     for country in COUNTRIES:
         print('Fetching ads for {}'.format(country['code']))
         write_to_file(
             country_code=country['code'],
             page_size=country['page_size'],
+            token=token,
         )
