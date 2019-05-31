@@ -1,6 +1,7 @@
 import json
 import datetime
 import os
+import pathlib
 import logging
 import re
 import time
@@ -174,9 +175,14 @@ def write_to_file(country_code='FR', page_size=250):
     with open(filename_date, 'w') as outfile:
         json.dump(ads, outfile)
 
+
+# python -c "from fb_fetch import fetch; fetch.create_dirs()"
 def create_dirs():
-    for country_code in COUNTRIES:
-        os.mkdir('data/' + country['code'])
+    pathlib.Path('data/reports').mkdir(exist_ok=True)
+    for country in COUNTRIES:
+        pathlib.Path('data/' + country['code']).mkdir(exist_ok=True)
+        pathlib.Path('data/reports/' + country['code']).mkdir(exist_ok=True)
+
 
 if __name__ == '__main__':
     for country in COUNTRIES:
