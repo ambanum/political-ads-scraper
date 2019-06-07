@@ -13,7 +13,7 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 
 class Headers():
-    max_count = 50
+    max_count = 34
 
     def __init__(self):
         self._count = None
@@ -21,7 +21,8 @@ class Headers():
 
     def _renew_headers(self):
         def get_root_page():
-            response_root = requests.get(
+            response_root = requests.request(
+                'GET',
                 'https://ads.twitter.com/transparency/i/political_advertisers'
             )
             response_root.raise_for_status()
@@ -41,7 +42,8 @@ class Headers():
         csrf_token, script_url = get_root_page()
 
         def get_bearer_token(script_url):
-            response_script = requests.get(
+            response_script = requests.request(
+                'GET',
                 script_url
             )
             response_script.raise_for_status()
@@ -65,7 +67,8 @@ class Headers():
         }
 
         def get_guest_token(headers):
-            response_activate = requests.post(
+            response_activate = requests.request(
+                'POST',
                 'https://api.twitter.com/1.1/guest/activate.json',
                 headers=headers,
             )
@@ -87,14 +90,33 @@ class Headers():
         return self._headers
 
 
+class Api():
+    def __init__(self):
+        self.headers = Headers()
+
+    def request(self, method, url):
+        response = None
+        nb_retry = 0
+        while not response or (response.status_code != 200 and nb_retry < 5):
+            response = requests.request(
+                method,
+                url,
+                headers=self.headers.headers,
+                timeout=60,
+            )
+            if response.status_code != 200:
+                print(response.status_code, url, response.text)
+            nb_retry += 1
+        return response
+
 
 def fetch():
-    headers = Headers()
+    api = Api()
 
-    def get_advertisers(headers):
-        response_advertisers = requests.get(
+    def get_advertisers():
+        response_advertisers = api.request(
+            'GET',
             'https://ads.twitter.com/transparency/political_advertisers.json?user_list_type=POLITICAL_EU',
-            headers=headers.headers,
         )
         response_advertisers.raise_for_status()
 
@@ -103,11 +125,11 @@ def fetch():
             for adv in response_advertisers.json()['users']
         ]
 
-        response_lookup = requests.get(
+        response_lookup = api.request(
+            'GET',
             'https://api.twitter.com/1.1/users/lookup.json?include_entities=true&include_ext_highlighted_label=true&screen_name={}'.format(
                 '%2C'.join(advertiser_screen_names)
             ),
-            headers=headers.headers,
         )
         response_lookup.raise_for_status()
 
@@ -116,32 +138,31 @@ def fetch():
 
         return advertisers_data
 
-    advertisers_data = get_advertisers(headers)
+    advertisers_data = get_advertisers()
 
-    def get_advertiser_tweets(adv, headers):
+    def get_advertiser_tweets(adv):
         adv_screen_name = adv['screen_name']
         adv_id = adv['id_str']
         print('Fetching data for {}'.format(adv_screen_name))
 
-        response_advertiser_metadata = requests.get(
+        response_advertiser_metadata = api.request(
+            'GET',
             'https://ads.twitter.com/transparency/user_metadata.json?screen_name={}'.format(adv_screen_name),
-            headers=headers.headers,
         )
         response_advertiser_metadata.raise_for_status()
 
         adv_metadata = response_advertiser_metadata.json()
         assert adv_metadata == {'isPolitical': True, 'isIssue': False, 'isSuspended': False}
 
-        timeline = []
         tweets = []
-        cursor = '5'
+        cursor = '0'
         while cursor:
-            response_timeline = requests.get(
+            response_timeline = api.request(
+                'GET',
                 'https://ads.twitter.com/transparency/tweets_timeline.json?user_id={}&cursor={}'.format(
                     adv_id,
                     cursor,
                 ),
-                headers=headers.headers,
             )
             response_timeline.raise_for_status()
             timeline_batch = response_timeline.json()
@@ -157,11 +178,11 @@ def fetch():
                 }
                 for tweet in tweets_basic_data
             }
-            response_tweets = requests.get(
+            response_tweets = api.request(
+                'GET',
                 'https://api.twitter.com/1.1/statuses/lookup.json?cards_platform=Web-12&include_cards=1&include_ext_alt_text=true&include_ext_highlighted_label=true&include_reply_count=1&tweet_mode=extended&trim_user=0&include_ext_media_color=1&id={}'.format(
                     '%2C'.join(tweet_ids)
                 ),
-                headers=headers.headers,
             )
             response_tweets.raise_for_status()
             tweets_additional_data = response_tweets.json()
@@ -169,24 +190,25 @@ def fetch():
                 data_by_id[tweet_additional_data['id_str']]['additional_data'] = tweet_additional_data
 
             for tweet_id in tweet_ids:
+                print(tweet_id)
                 if 'additional_data' in data_by_id[tweet_id]:
 
-                    response_tweet_metadata = requests.get(
+                    response_tweet_metadata = api.request(
+                        'GET',
                         'https://ads.twitter.com/transparency/line_item_metadata.json?tweet_id={}&user_id={}'.format(
                             tweet_id,
                             adv_id,
                         ),
-                        headers=headers.headers,
                     )
                     response_tweet_metadata.raise_for_status()
                     tweet_metadata = response_tweet_metadata.json()
 
-                    response_tweet_perf = requests.get(
+                    response_tweet_perf = api.request(
+                        'GET',
                         'https://ads.twitter.com/transparency/tweet_performance.json?tweet_id={}&user_id={}'.format(
                             tweet_id,
                             adv_id,
                         ),
-                        headers=headers.headers,
                     )
                     response_tweet_perf.raise_for_status()
                     tweet_perf = response_tweet_perf.json()
@@ -197,25 +219,24 @@ def fetch():
                         line_item_id = campaign['line_item_id']
 
 
-                        response_campaign_targeting_criteria = requests.get(
+                        response_campaign_targeting_criteria = api.request(
+                            'GET',
                             'https://ads.twitter.com/transparency/data/line_item_delivered_targeting_criteria.json?account_id={}&line_item_id={}'.format(
                                 account_id,
                                 line_item_id,
                             ),
-                            headers=headers.headers,
                         )
                         response_campaign_targeting_criteria.raise_for_status()
                         line_item_delivered_targeting_criteria = response_campaign_targeting_criteria.json()
 
 
-                        response_campaign_targeted_audience = requests.get(
+                        response_campaign_targeted_audience = api.request(
+                            'GET',
                             'https://ads.twitter.com/transparency/data/line_item_targeted_audience.json?account_id={}&line_item_id={}'.format(
                                 account_id,
                                 line_item_id,
                             ),
-                            headers=headers.headers,
                         )
-                        print(response_campaign_targeted_audience.text)
                         response_campaign_targeted_audience.raise_for_status()
                         line_item_targeted_audience = response_campaign_targeted_audience.json()
 
@@ -240,15 +261,11 @@ def fetch():
 
             cursor = timeline_batch.get('cursor')
 
-
-        return {
-            'timeline': timeline,
-            'tweets': tweets,
-        }
+        return tweets
 
 
     advertisers_tweets = {
-        adv['id_str']: get_advertiser_tweets(adv=adv, headers=headers)
+        adv['id_str']: get_advertiser_tweets(adv=adv)
         for adv in advertisers_data
     }
 
