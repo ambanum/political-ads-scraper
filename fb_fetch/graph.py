@@ -5,8 +5,9 @@ import json
 
 from fb_fetch import fetch
 
-ROOT_DIR = pathlib.Path('/home/michel/projects/desinfo/political-ads-scraper')
-#ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
+
+ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
+
 
 def build_graph():
     timeseries = {}
