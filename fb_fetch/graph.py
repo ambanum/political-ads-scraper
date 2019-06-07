@@ -45,7 +45,7 @@ def build_graph():
             'report': reports_timeseries,
         }
 
-    with open(ROOT_DIR / 'data/graph_nb_ads.json', 'w') as f:
+    with open(ROOT_DIR / 'data/graph_nb_ads_facebook.json', 'w') as f:
         json.dump(timeseries, f)
 
 if __name__ == '__main__':
