@@ -97,7 +97,7 @@ class Api():
     def request(self, method, url):
         response = None
         nb_retry = 0
-        while not response or (response.status_code != 200 and nb_retry < 5):
+        while ((not response) and (nb_retry < 5)):
             response = requests.request(
                 method,
                 url,
@@ -237,8 +237,10 @@ def fetch():
                                 line_item_id,
                             ),
                         )
-                        response_campaign_targeted_audience.raise_for_status()
-                        line_item_targeted_audience = response_campaign_targeted_audience.json()
+                        if response_campaign_targeted_audience.status_code != 200:
+                            line_item_targeted_audience = None
+                        else:
+                            line_item_targeted_audience = response_campaign_targeted_audience.json()
 
                         campaigns_data.append({
                             'line_item_delivered_targeting_criteria': line_item_delivered_targeting_criteria,
