@@ -28,6 +28,8 @@ const paramsToClassificationType = {
 router.get('/annotations/:type?', async function (req, res, next) {
     try {
         const type = req.params.type;
+        const skip = parseInt(req.query.skip) || 0;
+        const limit = parseInt(req.query.limit) || 100;
         const annotationsCount = await getDatabase().collection('annotations').count();
         const adsCollection = await getDatabase().collection('annotations');
         const query = [
@@ -49,10 +51,18 @@ router.get('/annotations/:type?', async function (req, res, next) {
             });
         }
 
+        query.push({ $skip: skip });
+        query.push({ $limit: limit });
+
         const results = await adsCollection.aggregate(query).toArray();
 
         res.json({
             results,
+            pagination: {
+                total: annotationsCount,
+                skip,
+                limit
+            }
         });
     } catch (e) {
         return next(e);
