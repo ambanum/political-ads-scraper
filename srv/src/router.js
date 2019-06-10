@@ -5,7 +5,59 @@ const crypto = require('crypto');
 
 const router = express.Router();
 const DEFAULT_NB_ADDS = 20;
+const CLASSIFICATION_TYPES = {
+  NOTHING_SUSPECT: 'Nothing suspect',
+  CANT_SAY: "Can't say",
+  SURVEY: 'Contains a survey',
+  NOT_RELATED_TO_POLITICS_OR_ISSUES_OF_NATIONAL_IMPORTANCE:
+    'Not related to politics or issues of national importance',
+  PROMOTES_A_CANDIDATE: 'Promotes a candidate, list or political party',
+  INTRODUCES_OF_A_NEW_CONTROVERSIAL_ELEMENT:
+    'Introduces of a new controversial element',
+};
 
+const paramsToClassificationType = {
+    survey: CLASSIFICATION_TYPES.SURVEY,
+    'promotes-candidates': CLASSIFICATION_TYPES.PROMOTES_A_CANDIDATE,
+    'new-controversial-element': CLASSIFICATION_TYPES.INTRODUCES_OF_A_NEW_CONTROVERSIAL_ELEMENT,
+    'nothing-suspect': CLASSIFICATION_TYPES.NOTHING_SUSPECT,
+    'cant-say': CLASSIFICATION_TYPES.CANT_SAY,
+    'not-related-to-politics': CLASSIFICATION_TYPES.NOT_RELATED_TO_POLITICS_OR_ISSUES_OF_NATIONAL_IMPORTANCE,
+}
+
+router.get('/annotations/:type?', async function (req, res, next) {
+    try {
+        const type = req.params.type;
+        const annotationsCount = await getDatabase().collection('annotations').count();
+        const adsCollection = await getDatabase().collection('annotations');
+        const query = [
+            {
+                $lookup:
+                {
+                    from: "ads",
+                    localField: "adId",
+                    foreignField: "ad_id",
+                    as: 'ad'
+                }
+            },
+            { $unwind: '$ad' },
+        ];
+
+        if (type && paramsToClassificationType[type]) {
+            query.push({
+                $match: { 'payload.value': paramsToClassificationType[type]}
+            });
+        }
+
+        const results = await adsCollection.aggregate(query).toArray();
+
+        res.json({
+            results,
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
 
 router.get('/counts', async function (req, res, next) {
     try {
