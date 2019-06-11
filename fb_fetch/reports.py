@@ -132,7 +132,6 @@ def fetch_for_date_country(today, country_code):
 def fetch_for_date(today):
     for country in fb_fetch.fetch.COUNTRIES:
         country_code=country['code']
-        print('Fetching for {} and {}'.format(today, country_code))
         fetch_for_date_country(today=today, country_code=country_code)
 
 

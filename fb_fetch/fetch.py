@@ -136,7 +136,6 @@ def fetch(country_code, page_size, token):
         assert set(json_data) <= {'data', 'paging'}, set(json_data)
 
         ads = json_data['data']
-        print('{} Got {} ads'.format(datetime.datetime.now(), len(ads)))
 
         if country_code == 'US':
             # We don't keep US ads (there are way too many)
@@ -169,7 +168,6 @@ def write_to_file(country_code, page_size, token):
     while not ads and nb_retry < 5:
         try:
             nb_retry += 1
-            print('Try {}'.format(nb_retry))
 
             ads = fetch(
                 country_code=country_code,
@@ -177,7 +175,6 @@ def write_to_file(country_code, page_size, token):
                 token=token,
             )
 
-            print('Found {} ads.'.format(len(ads)))
         except Exception as exception:
             print('{} Fetch failed'.format(datetime.datetime.now()))
             logging.exception('Fetch failed')
@@ -209,7 +206,6 @@ if __name__ == '__main__':
     token = FacebookToken()
 
     for country in COUNTRIES:
-        print('Fetching ads for {}'.format(country['code']))
         write_to_file(
             country_code=country['code'],
             page_size=country['page_size'],
