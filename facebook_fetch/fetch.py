@@ -8,7 +8,7 @@ import time
 
 import requests
 
-from fb_fetch import config
+from facebook_fetch import config
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 FIELDS = [
@@ -194,7 +194,7 @@ def write_to_file(country_code, page_size, token):
         json.dump(ads, outfile)
 
 
-# python -c "from fb_fetch import fetch; fetch.create_dirs()"
+# python -c "from facebook_fetch import fetch; fetch.create_dirs()"
 def create_dirs():
     pathlib.Path('data/reports').mkdir(exist_ok=True)
     for country in COUNTRIES:

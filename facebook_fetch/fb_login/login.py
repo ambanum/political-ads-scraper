@@ -5,7 +5,7 @@ import pyotp
 import requests
 import mechanize
 
-from fb_fetch import config
+from facebook_fetch import config
 
 
 def inspect_token(token):

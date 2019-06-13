@@ -1,7 +1,7 @@
 from flask import Flask, request
 
-from fb_fetch.fb_login.login import connect_and_get_user_token
-from fb_fetch import config
+from facebook_fetch.fb_login.login import connect_and_get_user_token
+from facebook_fetch import config
 
 application = Flask(__name__)
 

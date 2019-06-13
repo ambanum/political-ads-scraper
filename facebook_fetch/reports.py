@@ -7,7 +7,7 @@ import time
 
 import requests
 
-import fb_fetch.fetch
+import facebook_fetch.fetch
 
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
@@ -130,12 +130,12 @@ def fetch_for_date_country(today, country_code):
             f.write(response.content)
 
 def fetch_for_date(today):
-    for country in fb_fetch.fetch.COUNTRIES:
+    for country in facebook_fetch.fetch.COUNTRIES:
         country_code=country['code']
         fetch_for_date_country(today=today, country_code=country_code)
 
 
-# python -c "import datetime; from fb_fetch import reports; reports.init(start_date=datetime.date(2019, 5, 10))"
+# python -c "import datetime; from facebook_fetch import reports; reports.init(start_date=datetime.date(2019, 5, 10))"
 def init(start_date):
     current_date = start_date
     today = datetime.date.today()

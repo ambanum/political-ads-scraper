@@ -3,7 +3,7 @@ import pathlib
 import datetime
 import json
 
-from fb_fetch import fetch
+from facebook_fetch import fetch
 
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent

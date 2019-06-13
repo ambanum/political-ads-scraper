@@ -24,4 +24,4 @@ echo
 echo "---- Running deployment script on remote server ----"
 run ssh $SERVER bash $REMOTE_SCRIPT_PATH
 
-echo "Fine! Now you should update the data by running scp or rsync: 'scp -r data cloud@desinfo.quaidorsay.fr:/home/cloud/political-ads-scraper' or 'rsync -rltzvh data/ cloud@desinfo.quaidorsay.fr:~/political-ads-scraper/data'"
+echo "Fine! Now you may have to update the data by running rsync: 'rsync -rltzvh data/ cloud@desinfo.quaidorsay.fr:/dev/vdb/political-ads-scraper'"

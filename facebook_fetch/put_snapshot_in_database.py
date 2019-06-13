@@ -8,10 +8,10 @@ import logging
 
 from pymongo import MongoClient
 
-from fb_fetch import config
-from fb_fetch import fetch
-from fb_fetch import snapshot
-from fb_fetch.fb_login import login
+from facebook_fetch import config
+from facebook_fetch import fetch
+from facebook_fetch import snapshot
+from facebook_fetch.fb_login import login
 
 
 def process_batch():
