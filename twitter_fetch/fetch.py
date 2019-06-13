@@ -7,8 +7,8 @@ import time
 
 import requests
 
+from twitter_fetch import config
 
-ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/74.0.3729.169 Chrome/74.0.3729.169 Safari/537.36'
 
 
@@ -279,7 +279,7 @@ def fetch():
 def write_to_file():
     data = fetch()
 
-    filename = ROOT_DIR / 'data/twitter/twitter-ads_EU_{}.json'.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    filename = config.DATA_DIR / 'twitter/twitter-ads_EU_{}.json'.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)

@@ -90,7 +90,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("""
 Usage:
-> python facebook_fetch/removal/py data/FR/facebook-ads-archive_FR_2019-05-16_20-37-43.json data/FR/facebook-ads-archive_FR_2019-05-20_14-03-03.json
+> python facebook_fetch/removal.py data/facebook/API/FR/facebook-ads-archive_FR_2019-05-16_20-37-43.json data/facebook/API/FR/facebook-ads-archive_FR_2019-05-20_14-03-03.json
 """)
         exit()
 

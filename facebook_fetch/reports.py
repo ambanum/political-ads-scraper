@@ -8,9 +8,8 @@ import time
 import requests
 
 import facebook_fetch.fetch
+from facebook_fetch import config
 
-
-ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 FORM_DATA = "__user=0&__a=1&__dyn=&__req=1&__be=1&__pc=PHASED%3ADEFAULT&dpr=1&__rev=&__s=&lsd=&jazoest="
 FORM_HEADERS = {
@@ -114,7 +113,7 @@ def fetch_for_date_country(today, country_code):
         },
     }
 
-    report_dir = ROOT_DIR / 'data' / 'reports' / country_code / str(today)
+    report_dir = config.DATA_DIR / 'facebook' / 'reports' / country_code / str(today)
     report_dir.mkdir()
     with open(report_dir / 'data.json', 'w') as f:
         json.dump(country_data, f)

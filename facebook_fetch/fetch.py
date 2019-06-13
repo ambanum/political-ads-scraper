@@ -10,7 +10,6 @@ import requests
 
 from facebook_fetch import config
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 FIELDS = [
     'ad_creation_time',
     'ad_creative_body',
@@ -185,21 +184,19 @@ def write_to_file(country_code, page_size, token):
         print('Could not fetch ads for country {}'.format(country_code))
         return
 
-    filename_format = ROOT_DIR + '/data/' + country_code + '/facebook-ads-archive_' + country_code + '_{}.json'
+    file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_{}.json'.format(country_code, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
-    filename_date = filename_format.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-    #filename_latest = filename_format.format('latest')
-
-    with open(filename_date, 'w') as outfile:
+    with open(file_path, 'w') as outfile:
         json.dump(ads, outfile)
 
 
 # python -c "from facebook_fetch import fetch; fetch.create_dirs()"
 def create_dirs():
-    pathlib.Path('data/reports').mkdir(exist_ok=True)
+    (config.DATA_DIR / 'facebook/reports').mkdir(exist_ok=True)
+    (config.DATA_DIR / 'facebook/API').mkdir(exist_ok=True)
     for country in COUNTRIES:
-        pathlib.Path('data/' + country['code']).mkdir(exist_ok=True)
-        pathlib.Path('data/reports/' + country['code']).mkdir(exist_ok=True)
+        (config.DATA_DIR / 'facebook/API' / country['code']).mkdir(exist_ok=True)
+        (config.DATA_DIR / 'facebook/reports' / country['code']).mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':

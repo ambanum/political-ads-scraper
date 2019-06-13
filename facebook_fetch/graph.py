@@ -3,10 +3,7 @@ import pathlib
 import datetime
 import json
 
-from facebook_fetch import fetch
-
-
-ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
+from facebook_fetch import fetch, config
 
 
 def build_graph():
@@ -16,7 +13,7 @@ def build_graph():
         print(country_code)
 
         api_timeseries = {}
-        for filename in sorted(list((ROOT_DIR / 'data' / country_code).iterdir())):
+        for filename in sorted(list((config.DATA_DIR / 'facebook/API' / country_code).iterdir())):
             fetch_datetime = datetime.datetime.strptime(
                 filename.stem,
                 'facebook-ads-archive_{}_%Y-%m-%d_%H-%M-%S'.format(country_code),
@@ -28,7 +25,7 @@ def build_graph():
             api_timeseries[fetch_datetime.strftime("%Y-%m-%d")] = len(ads)
 
         reports_timeseries = {}
-        for dir_path in sorted(list((ROOT_DIR / 'data/reports' / country_code).iterdir())):
+        for dir_path in sorted(list((config.DATA_DIR / 'facebook/reports' / country_code).iterdir())):
             date_str = dir_path.name
             date = datetime.date(*map(int, date_str.split('-')))
             yesterday = date - datetime.timedelta(1)
@@ -45,7 +42,7 @@ def build_graph():
             'report': reports_timeseries,
         }
 
-    with open(ROOT_DIR / 'data/graph_nb_ads_facebook.json', 'w') as f:
+    with open(config.DATA_DIR / 'facebook/graph_nb_ads_facebook.json', 'w') as f:
         json.dump(timeseries, f)
 
 if __name__ == '__main__':
