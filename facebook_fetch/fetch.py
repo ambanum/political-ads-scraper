@@ -192,8 +192,10 @@ def write_to_file(country_code, page_size, token):
 
 # python -c "from facebook_fetch import fetch; fetch.create_dirs()"
 def create_dirs():
+    (config.DATA_DIR / 'facebook').mkdir(exist_ok=True)
     (config.DATA_DIR / 'facebook/reports').mkdir(exist_ok=True)
     (config.DATA_DIR / 'facebook/API').mkdir(exist_ok=True)
+    (config.DATA_DIR / 'twitter').mkdir(exist_ok=True)
     for country in COUNTRIES:
         (config.DATA_DIR / 'facebook/API' / country['code']).mkdir(exist_ok=True)
         (config.DATA_DIR / 'facebook/reports' / country['code']).mkdir(exist_ok=True)
