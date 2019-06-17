@@ -10,7 +10,6 @@ def build_graph():
     timeseries = {}
     for country in fetch.COUNTRIES:
         country_code = country['code']
-        print(country_code)
 
         api_timeseries = {}
         for filename in sorted(list((config.DATA_DIR / 'facebook/API' / country_code).iterdir())):
