@@ -4,11 +4,15 @@ import json
 
 from twitter_fetch import config
 
+GRAPH_FILE_NAME = 'graph_nb_ads_EU_twitter.json'
 
 def read_ad_ids():
     ad_ids_by_date = {}
 
     for filename in sorted(list((config.DATA_DIR / 'twitter').iterdir())):
+        if filename.name == GRAPH_FILE_NAME:
+            continue
+
         fetch_datetime = datetime.datetime.strptime(
             filename.stem,
             'twitter-ads_EU_%Y-%m-%d_%H-%M-%S',
@@ -48,7 +52,7 @@ def compute_graph(ad_ids_by_date):
 def write_graph():
     ad_ids_by_date = read_ad_ids()
     time_series = compute_graph(ad_ids_by_date)
-    with open(config.DATA_DIR / 'twitter/graph_nb_ads_twitter.json', 'w') as f:
+    with open(config.DATA_DIR / 'twitter' / GRAPH_FILE_NAME, 'w') as f:
         json.dump(time_series, f)
 
 
