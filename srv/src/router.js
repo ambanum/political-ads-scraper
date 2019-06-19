@@ -30,10 +30,10 @@ router.get('/annotations/:type?', async function (req, res, next) {
         const type = req.params.type;
         const skip = parseInt(req.query.skip) || 0;
         const limit = parseInt(req.query.limit) || 100;
+        const isReview = !!req.query.isReview || false;
         const annotationsCount = await getDatabase().collection('annotations').count();
         const annotationsCollection = await getDatabase().collection('annotations');
         const query = [
-            { $match: { 'isReview': { '$ne': true } }},
             {
                 $lookup:
                 {
@@ -50,6 +50,13 @@ router.get('/annotations/:type?', async function (req, res, next) {
             query.push({
                 $match: { 'payload.value': paramsToClassificationType[type]}
             });
+        }
+
+
+        if (isReview) {
+            query.unshift({ $match: { 'isReview': { '$eq': true } }});
+        } else {
+            query.unshift({ $match: { 'isReview': { '$ne': true } }});
         }
 
         query.push({ $skip: skip });
