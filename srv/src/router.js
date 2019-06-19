@@ -43,6 +43,7 @@ router.get('/annotations/:type?', async function (req, res, next) {
                     as: 'ad'
                 }
             },
+            { $unwind: '$ad' },
         ];
 
         if (type && paramsToClassificationType[type]) {
