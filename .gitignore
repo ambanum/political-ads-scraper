@@ -11,3 +11,4 @@ data
 node_modules
 
 .vscode
+.env
