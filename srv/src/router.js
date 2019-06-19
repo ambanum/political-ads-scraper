@@ -31,8 +31,9 @@ router.get('/annotations/:type?', async function (req, res, next) {
         const skip = parseInt(req.query.skip) || 0;
         const limit = parseInt(req.query.limit) || 100;
         const annotationsCount = await getDatabase().collection('annotations').count();
-        const adsCollection = await getDatabase().collection('annotations');
+        const annotationsCollection = await getDatabase().collection('annotations');
         const query = [
+            { $match: { 'isReview': { '$ne': true } }},
             {
                 $lookup:
                 {
@@ -42,7 +43,6 @@ router.get('/annotations/:type?', async function (req, res, next) {
                     as: 'ad'
                 }
             },
-            { $unwind: '$ad' },
         ];
 
         if (type && paramsToClassificationType[type]) {
@@ -54,7 +54,7 @@ router.get('/annotations/:type?', async function (req, res, next) {
         query.push({ $skip: skip });
         query.push({ $limit: limit });
 
-        const results = await adsCollection.aggregate(query).toArray();
+        const results = await annotationsCollection.aggregate(query).toArray();
 
         res.json({
             results,
