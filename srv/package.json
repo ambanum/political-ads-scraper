@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ambanum/political-ads-scraper#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "csv-stringify": "^5.3.0",
     "dotenv": "^8.0.0",
     "express": "^4.16.4",
     "mongodb": "^3.2.4",
