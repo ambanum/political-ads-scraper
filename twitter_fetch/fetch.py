@@ -152,7 +152,7 @@ def fetch():
         response_advertiser_metadata.raise_for_status()
 
         adv_metadata = response_advertiser_metadata.json()
-        assert adv_metadata == {'isPolitical': True, 'isIssue': False, 'isSuspended': False}
+        #assert adv_metadata == {'isPolitical': True, 'isIssue': False, 'isSuspended': False}
 
         tweets = []
         cursor = '0'
