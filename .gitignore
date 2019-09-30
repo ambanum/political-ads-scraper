@@ -7,8 +7,4 @@ __pycache__
 *.egg-info
 
 data
-
-node_modules
-
 .vscode
-.env
