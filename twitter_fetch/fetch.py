@@ -125,6 +125,7 @@ def fetch():
             adv['screenName']
             for adv in response_advertisers.json()['users']
         ]
+        print(advertiser_screen_names)
 
         response_lookup = api.request(
             'GET',
@@ -144,6 +145,7 @@ def fetch():
     def get_advertiser_tweets(adv):
         adv_screen_name = adv['screen_name']
         adv_id = adv['id_str']
+        print(adv_screen_name)
 
         response_advertiser_metadata = api.request(
             'GET',
@@ -172,6 +174,7 @@ def fetch():
                 tweet['tweetId']
                 for tweet in tweets_basic_data
             ]
+            print(tweet_ids)
             data_by_id = {
                 tweet['tweetId']: {
                     'basic_data': tweet
@@ -190,6 +193,7 @@ def fetch():
                 data_by_id[tweet_additional_data['id_str']]['additional_data'] = tweet_additional_data
 
             for tweet_id in tweet_ids:
+                print(tweet_id)
                 if 'additional_data' in data_by_id[tweet_id]:
 
                     response_tweet_metadata = api.request(
