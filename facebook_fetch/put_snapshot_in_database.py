@@ -19,11 +19,11 @@ def process_batch():
     client = MongoClient(config.MONGODB_URL)
     ads_collection = client.facebook_ads.ads
 
-    #ads_collection.create_index('ad_id')
+    # ads_collection.create_index('ad_id')
 
     user_access_token, browser = login.connect_and_get_user_token()
 
-    ads_to_process = ads_collection.find({ "snapshot" : { "$exists" : False } })
+    ads_to_process = ads_collection.find({"snapshot": {"$exists": False}})
 
     for ad in ads_to_process:
         ad_id = fetch.get_ad_id(ad)
@@ -37,7 +37,7 @@ def process_batch():
             )
 
             ads_collection.update_one(
-                {'_id': ad['_id'] },
+                {'_id': ad['_id']},
                 {
                     '$set': {
                         'ad_id': ad_id,
@@ -53,8 +53,9 @@ def process_batch():
             time.sleep(5)
             #user_access_token, browser = login.connect_and_get_user_token()
 
+
 process_batch()
-#while True:
+# while True:
 #    try:
 #        process_batch()
 

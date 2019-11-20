@@ -1,7 +1,5 @@
 import json
 import datetime
-import os
-import pathlib
 import logging
 import re
 import time
@@ -29,39 +27,40 @@ FIELDS = [
     'spend',
 ]
 COUNTRIES = [
-    {'code': 'AT', 'page_size': 250}, # Austria
-    {'code': 'BE', 'page_size': 250}, # Belgium
-    {'code': 'BG', 'page_size': 250}, # Bulgaria
-    {'code': 'CY', 'page_size': 250}, # Cyprus
-    {'code': 'CZ', 'page_size': 250}, # Czechia
-    {'code': 'DE', 'page_size': 1000}, # Germany
-    {'code': 'DK', 'page_size': 250}, # Denmark
-    {'code': 'EE', 'page_size': 250}, # Estonia
-    {'code': 'ES', 'page_size': 250}, # Spain
-    {'code': 'FI', 'page_size': 250}, # Finland
-    {'code': 'FR', 'page_size': 250}, # France
-    {'code': 'GR', 'page_size': 250}, # Greece
-    {'code': 'HR', 'page_size': 250}, # Croatia
-    {'code': 'HU', 'page_size': 250}, # Hungary
-    {'code': 'IE', 'page_size': 250}, # Ireland
-    {'code': 'IT', 'page_size': 250}, # Italy
-    {'code': 'LT', 'page_size': 250}, # Lithuania
-    {'code': 'LU', 'page_size': 250}, # Luxembourg
-    {'code': 'LV', 'page_size': 250}, # Latvia
-    {'code': 'MT', 'page_size': 250}, # Malta
-    {'code': 'NL', 'page_size': 250}, # Netherlands
-    {'code': 'PL', 'page_size': 250}, # Poland
-    {'code': 'PT', 'page_size': 250}, # Portugal
-    {'code': 'RO', 'page_size': 250}, # Romania
-    {'code': 'SI', 'page_size': 250}, # Slovenia
-    {'code': 'SE', 'page_size': 250}, # Sweden
-    {'code': 'SK', 'page_size': 250}, # Slovakia
-    {'code': 'GB', 'page_size': 250}, # United Kingdom
-#    {'code': 'US', 'page_size': 2000}, # United States of America
+    {'code': 'AT', 'page_size': 250},  # Austria
+    {'code': 'BE', 'page_size': 250},  # Belgium
+    {'code': 'BG', 'page_size': 250},  # Bulgaria
+    {'code': 'CY', 'page_size': 250},  # Cyprus
+    {'code': 'CZ', 'page_size': 250},  # Czechia
+    {'code': 'DE', 'page_size': 1000},  # Germany
+    {'code': 'DK', 'page_size': 250},  # Denmark
+    {'code': 'EE', 'page_size': 250},  # Estonia
+    {'code': 'ES', 'page_size': 250},  # Spain
+    {'code': 'FI', 'page_size': 250},  # Finland
+    {'code': 'FR', 'page_size': 250},  # France
+    {'code': 'GR', 'page_size': 250},  # Greece
+    {'code': 'HR', 'page_size': 250},  # Croatia
+    {'code': 'HU', 'page_size': 250},  # Hungary
+    {'code': 'IE', 'page_size': 250},  # Ireland
+    {'code': 'IT', 'page_size': 250},  # Italy
+    {'code': 'LT', 'page_size': 250},  # Lithuania
+    {'code': 'LU', 'page_size': 250},  # Luxembourg
+    {'code': 'LV', 'page_size': 250},  # Latvia
+    {'code': 'MT', 'page_size': 250},  # Malta
+    {'code': 'NL', 'page_size': 250},  # Netherlands
+    {'code': 'PL', 'page_size': 250},  # Poland
+    {'code': 'PT', 'page_size': 250},  # Portugal
+    {'code': 'RO', 'page_size': 250},  # Romania
+    {'code': 'SI', 'page_size': 250},  # Slovenia
+    {'code': 'SE', 'page_size': 250},  # Sweden
+    {'code': 'SK', 'page_size': 250},  # Slovakia
+    {'code': 'GB', 'page_size': 250},  # United Kingdom
+    #    {'code': 'US', 'page_size': 2000}, # United States of America
 ]
 
+
 class FacebookToken():
-    _delay = datetime.timedelta(0, 30*60) # 30 minutes
+    _delay = datetime.timedelta(0, 30*60)  # 30 minutes
 
     def __init__(self):
         self._timestamp = None
@@ -87,9 +86,13 @@ class FacebookToken():
         return self._token
 
 
-AD_ID_REGEX = re.compile(r'^https://www\.facebook\.com/ads/archive/render_ad/\?id=(\d+)&access_token=[a-zA-Z0-9]+$')
+AD_ID_REGEX = re.compile(
+    r'^https://www\.facebook\.com/ads/archive/render_ad/\?id=(\d+)&access_token=[a-zA-Z0-9]+$')
+
+
 def get_ad_id(ad):
     return AD_ID_REGEX.match(ad['ad_snapshot_url']).groups()[0]
+
 
 def fetch(country_code, page_size, token):
     def make_request(token_value, after=None):
@@ -120,7 +123,8 @@ def fetch(country_code, page_size, token):
                     timeout=60,
                 )
 
-                assert response.status_code == 200, (response.status_code, response.text)
+                assert response.status_code == 200, (
+                    response.status_code, response.text)
 
             except Exception as exception:
                 logging.exception('Request failed')
@@ -184,7 +188,9 @@ def write_to_file(country_code, page_size, token):
         print('Could not fetch ads for country {}'.format(country_code))
         return
 
-    file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_{}.json'.format(country_code, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    file_path = config.DATA_DIR / 'facebook/API' / country_code / \
+        'facebook-ads-archive_{}_{}.json'.format(
+            country_code, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
     with open(file_path, 'w') as outfile:
         json.dump(ads, outfile)
@@ -198,8 +204,10 @@ def create_dirs():
     (config.DATA_DIR / 'facebook/API').mkdir(exist_ok=True)
     (config.DATA_DIR / 'twitter').mkdir(exist_ok=True)
     for country in COUNTRIES:
-        (config.DATA_DIR / 'facebook/API' / country['code']).mkdir(exist_ok=True)
-        (config.DATA_DIR / 'facebook/reports' / country['code']).mkdir(exist_ok=True)
+        (config.DATA_DIR / 'facebook/API' /
+         country['code']).mkdir(exist_ok=True)
+        (config.DATA_DIR / 'facebook/reports' /
+         country['code']).mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':

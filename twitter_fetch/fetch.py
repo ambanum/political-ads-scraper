@@ -1,9 +1,7 @@
 
 import re
-import pathlib
 import datetime
 import json
-import time
 
 import requests
 
@@ -149,7 +147,8 @@ def fetch():
 
         response_advertiser_metadata = api.request(
             'GET',
-            'https://ads.twitter.com/transparency/user_metadata.json?screen_name={}'.format(adv_screen_name),
+            'https://ads.twitter.com/transparency/user_metadata.json?screen_name={}'.format(
+                adv_screen_name),
         )
         response_advertiser_metadata.raise_for_status()
 
@@ -190,7 +189,8 @@ def fetch():
             response_tweets.raise_for_status()
             tweets_additional_data = response_tweets.json()
             for tweet_additional_data in tweets_additional_data:
-                data_by_id[tweet_additional_data['id_str']]['additional_data'] = tweet_additional_data
+                data_by_id[tweet_additional_data['id_str']
+                           ]['additional_data'] = tweet_additional_data
 
             for tweet_id in tweet_ids:
                 print(tweet_id)
@@ -221,7 +221,6 @@ def fetch():
                         account_id = campaign['account_id']
                         line_item_id = campaign['line_item_id']
 
-
                         response_campaign_targeting_criteria = api.request(
                             'GET',
                             'https://ads.twitter.com/transparency/data/line_item_delivered_targeting_criteria.json?account_id={}&line_item_id={}'.format(
@@ -231,7 +230,6 @@ def fetch():
                         )
                         response_campaign_targeting_criteria.raise_for_status()
                         line_item_delivered_targeting_criteria = response_campaign_targeting_criteria.json()
-
 
                         response_campaign_targeted_audience = api.request(
                             'GET',
@@ -250,7 +248,7 @@ def fetch():
                             'line_item_targeted_audience': line_item_targeted_audience,
                         })
 
-                        #time.sleep(2)
+                        # time.sleep(2)
                 else:
                     tweet_metadata = None
                     tweet_perf = None
@@ -268,7 +266,6 @@ def fetch():
 
         return tweets
 
-
     advertisers_tweets = {
         adv['id_str']: get_advertiser_tweets(adv=adv)
         for adv in advertisers_data
@@ -283,7 +280,8 @@ def fetch():
 def write_to_file():
     data = fetch()
 
-    filename = config.DATA_DIR / 'twitter/twitter-ads_EU_{}.json'.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    filename = config.DATA_DIR / 'twitter/twitter-ads_EU_{}.json'.format(
+        datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
