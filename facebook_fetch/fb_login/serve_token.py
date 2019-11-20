@@ -5,6 +5,7 @@ from facebook_fetch import config
 
 application = Flask(__name__)
 
+
 @application.route('/')
 def hello():
     shared_secret = request.args.get('shared_secret')
@@ -14,5 +15,6 @@ def hello():
     token, _ = connect_and_get_user_token()
     return token
 
+
 if __name__ == '__main__':
-   application.run()
+    application.run()

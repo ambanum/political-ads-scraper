@@ -7,7 +7,8 @@ from facebook_fetch import fetch
 
 def compare_ad_lists(ads_old, ads_new):
 
-    print('Comparing {} old ads and {} new ads.'.format(len(ads_old), len(ads_new)))
+    print('Comparing {} old ads and {} new ads.'.format(
+        len(ads_old), len(ads_new)))
     print()
 
     for field in fetch.FIELDS:
@@ -17,7 +18,6 @@ def compare_ad_lists(ads_old, ads_new):
             len(ads_new)
         ))
     print()
-
 
     # Index
 
@@ -31,7 +31,6 @@ def compare_ad_lists(ads_old, ads_new):
 
     ads_old_by_id = to_dict(ads_old)
     ads_new_by_id = to_dict(ads_new)
-
 
     # Find removed ads
 
