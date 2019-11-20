@@ -14,3 +14,11 @@ Facebook [provides API access](https://www.facebook.com/ads/library/api) to the 
 For some countries (as of writing US, UK and Brazil), a [public report](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=GB) is available. Such reports make ads explorable through a web interface, and offer a CSV database as well. Facebook opened their Library for all EU countries mid-April. However, the public report is not available for most. This harvesting and re-exposure of data is thus currently the only way for people without a Facebook account to access the data. This work might thus not be as necessary when such reports are opened for all other countries.
 
 However, we can also say that the data exposed by the API seems incomplete as of now. Indeed, the API reports only 2.900 political ads on Great Britain while the [corresponding report](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=GB) lists 49.000 ads. The scope of the data available using the API is undocumented and tracking this data may improve the shared understanding of that scope.
+
+### Check the code with flake8
+
+To run flake8 use tox :
+
+```sh
+tox
+```
