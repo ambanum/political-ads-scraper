@@ -6,6 +6,7 @@ from twitter_fetch import config
 
 GRAPH_FILE_NAME = 'graph_nb_ads_EU_twitter.json'
 
+
 def read_ad_ids():
     ad_ids_by_date = {}
 
@@ -46,8 +47,9 @@ def compute_graph(ad_ids_by_date):
         }
 
         past_ads |= visible_ads
-    
+
     return time_series
+
 
 def write_graph():
     ad_ids_by_date = read_ad_ids()

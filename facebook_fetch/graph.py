@@ -15,7 +15,8 @@ def build_graph():
         for filename in sorted(list((config.DATA_DIR / 'facebook/API' / country_code).iterdir())):
             fetch_datetime = datetime.datetime.strptime(
                 filename.stem,
-                'facebook-ads-archive_{}_%Y-%m-%d_%H-%M-%S'.format(country_code),
+                'facebook-ads-archive_{}_%Y-%m-%d_%H-%M-%S'.format(
+                    country_code),
             )
 
             with open(filename, 'r') as f:
@@ -32,7 +33,8 @@ def build_graph():
             with open(dir_path / 'data.json', 'r') as f:
                 data = json.load(f)
 
-            nb_ads = data['lifetime_data'][str(yesterday)]['payload']['totalAds']
+            nb_ads = data['lifetime_data'][str(
+                yesterday)]['payload']['totalAds']
 
             reports_timeseries[date_str] = nb_ads
 
@@ -43,6 +45,7 @@ def build_graph():
 
     with open(config.DATA_DIR / 'facebook/graph_nb_ads_facebook.json', 'w') as f:
         json.dump(timeseries, f)
+
 
 if __name__ == '__main__':
     build_graph()

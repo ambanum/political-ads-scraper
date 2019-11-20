@@ -23,7 +23,8 @@ FORM_HEADERS = {
     'referer': 'https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=FR',
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/74.0.3729.169 Chrome/74.0.3729.169 Safari/537.36',
 }
-TIME_PRESETS = ['yesterday', 'last_7_days', 'last_30_days', 'last_90_days', 'lifelong']
+TIME_PRESETS = ['yesterday', 'last_7_days',
+                'last_30_days', 'last_90_days', 'lifelong']
 
 
 def fetch_endpoint(endpoint, date, country_code, time_preset=None):
@@ -79,6 +80,7 @@ def fetch_endpoint(endpoint, date, country_code, time_preset=None):
     data = json.loads(json_data)
     return data
 
+
 def fetch_for_date_country(today, country_code):
     dates = [
         today - datetime.timedelta(delta)
@@ -113,13 +115,15 @@ def fetch_for_date_country(today, country_code):
         },
     }
 
-    report_dir = config.DATA_DIR / 'facebook' / 'reports' / country_code / str(today)
+    report_dir = config.DATA_DIR / 'facebook' / \
+        'reports' / country_code / str(today)
     report_dir.mkdir()
     with open(report_dir / 'data.json', 'w') as f:
         json.dump(country_data, f)
 
     for time_preset in TIME_PRESETS:
-        url = country_data['download'][time_preset][str(today)]['payload']['uri']
+        url = country_data['download'][time_preset][str(
+            today)]['payload']['uri']
         if not url:
             continue
         filename = url.split('/')[-1].split('?')[0]
@@ -128,9 +132,10 @@ def fetch_for_date_country(today, country_code):
         with open(report_dir / filename, 'wb') as f:
             f.write(response.content)
 
+
 def fetch_for_date(today):
     for country in facebook_fetch.fetch.COUNTRIES:
-        country_code=country['code']
+        country_code = country['code']
         fetch_for_date_country(today=today, country_code=country_code)
 
 

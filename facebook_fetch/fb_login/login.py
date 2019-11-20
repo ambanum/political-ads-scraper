@@ -59,13 +59,15 @@ def connect_facebook():
     browser = mechanize.Browser()
     cookies = http.cookiejar.LWPCookieJar()
     browser.set_cookiejar(cookies)
-    browser.addheaders = [('User-agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/73.0.3683.86 Chrome/73.0.3683.86 Safari/537.36')]
+    browser.addheaders = [
+        ('User-agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/73.0.3683.86 Chrome/73.0.3683.86 Safari/537.36')]
     browser.set_handle_equiv(True)
     browser.set_handle_gzip(True)
     browser.set_handle_redirect(True)
     browser.set_handle_referer(True)
     browser.set_handle_robots(False)
-    browser.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+    browser.set_handle_refresh(
+        mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
     # Login page
     url = 'https://m.facebook.com/login.php'
@@ -90,16 +92,16 @@ def connect_facebook():
 
 
 def get_user_token(browser):
-    #print(response.read())
-    #print(cookies)
+    # print(response.read())
+    # print(cookies)
 
     #import sys, logging
     #logger = logging.getLogger("mechanize")
-    #logger.addHandler(logging.StreamHandler(sys.stdout))
-    #logger.setLevel(logging.DEBUG)
-    #browser.set_debug_http(True)
-    #browser.set_debug_responses(True)
-    #browser.set_debug_redirects(True)
+    # logger.addHandler(logging.StreamHandler(sys.stdout))
+    # logger.setLevel(logging.DEBUG)
+    # browser.set_debug_http(True)
+    # browser.set_debug_responses(True)
+    # browser.set_debug_redirects(True)
 
     browser.set_handle_redirect(False)
     params = urllib.parse.urlencode({
