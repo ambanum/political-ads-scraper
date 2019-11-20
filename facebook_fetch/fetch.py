@@ -1,7 +1,5 @@
 import json
 import datetime
-import os
-import pathlib
 import logging
 import re
 import time
