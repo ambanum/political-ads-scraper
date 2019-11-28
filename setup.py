@@ -8,6 +8,7 @@ setup(
         'beautifulsoup4>=4.7.1,<5',
         'flask>=1.0.3,<2',
         'mechanize>=0.4.2,<1',
+        'pandas==0.24.2',
         'pylint>=2.3.1,<4',
         'pymongo>=3.8.0,<4',
         'pyotp>=2.2.7,<3',
