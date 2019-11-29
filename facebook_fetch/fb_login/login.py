@@ -1,3 +1,4 @@
+
 import http.cookiejar
 import urllib
 
@@ -54,7 +55,7 @@ def try_app_token():
     test_token(app_token)
 
 
-def connect_facebook():
+def connect_facebook(user, password, totp):
     # Setup browser
     browser = mechanize.Browser()
     cookies = http.cookiejar.LWPCookieJar()
@@ -71,12 +72,12 @@ def connect_facebook():
     url = 'https://m.facebook.com/login.php'
     browser.open(url)
     browser.select_form(nr=0)
-    browser.form['email'] = config.FB_USER
-    browser.form['pass'] = config.FB_PASSWORD
+    browser.form['email'] = user
+    browser.form['pass'] = password
     browser.submit()
 
     # 2FA
-    totp = pyotp.TOTP(config.TOTP_SECRET)
+    totp = pyotp.TOTP(totp)
     browser.select_form(nr=0)
     browser.form['approvals_code'] = totp.now()
     browser.submit()
@@ -123,7 +124,7 @@ def get_user_token(browser):
     return user_access_token
 
 
-def connect_and_get_user_token():
-    browser = connect_facebook()
+def connect_and_get_user_token(user, password, totp):
+    browser = connect_facebook(user=user, password=password, totp=totp)
     user_access_token = get_user_token(browser)
     return user_access_token, browser

@@ -11,8 +11,8 @@ def hello():
     if shared_secret != config.FB_TOKEN_SERVICE_SECRET:
         return 'Incorrect shared secret. Send the shared secret as url parameter shared_secret', 401
 
-    token, _ = connect_and_get_user_token()
+    token, _ = connect_and_get_user_token(user=config.FB_USER, password=config.FB_PASSWORD, totp=config.TOTP_SECRET)
     return token
 
 if __name__ == '__main__':
-   application.run()
+    application.run()
