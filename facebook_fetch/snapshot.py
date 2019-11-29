@@ -42,7 +42,7 @@ def get_snapshot_data(user_access_token, browser, ad_id):
 
         react_components = []
         for require_item in data['require']:
-            if require_item[0] == 'ReactRenderer' and require_item[2][0] == 'PoliticalAdArchiveDemoAd.react':
+            if require_item[0] == 'ReactRenderer' and require_item[2][0] == 'AdLibraryV2DemoAd.react':
                 react_components.append(require_item[3])
         assert len(react_components) == 1
         react_component_list = react_components[0]
