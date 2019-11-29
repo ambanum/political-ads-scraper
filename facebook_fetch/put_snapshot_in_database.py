@@ -1,5 +1,8 @@
 """
 ssh -NT -L 27018:localhost:27017 cloud@desinfo.quaidorsay.fr
+
+This script has been ran for a first batch during May 2019, and during a second one during Novembre 2019. Media were saved
+only for the 2nd batch. (because CDN urls of the media expire in a few months)
 """
 
 
@@ -7,6 +10,7 @@ import time
 import logging
 
 from pymongo import MongoClient
+import requests
 
 from facebook_fetch import config
 from facebook_fetch import fetch
@@ -16,10 +20,12 @@ from facebook_fetch.fb_login import login
 
 def process_batch():
 
-    client = MongoClient(config.MONGODB_URL)
-    ads_collection = client.facebook_ads.ads
+    media_dir = config.DATA_DIR / 'facebook/media'
 
-    #ads_collection.create_index('ad_id')
+    client = MongoClient(config.MONGODB_URL)
+    ads_collection = client.facebook_ads.ads_2019_11
+
+    ads_collection.create_index('ad_id')
 
     user_access_token, browser = login.connect_and_get_user_token()
 
@@ -35,6 +41,25 @@ def process_batch():
                 browser=browser,
                 ad_id=ad_id,
             )
+
+            url_list = [
+                image_data['resized_image_url']
+                for image_data in snapshot_data['media']['images']
+            ]+[
+                image_data['video_sd_url']
+                for image_data in snapshot_data['media']['videos']
+            ]
+
+            for url in url_list:
+                media_filename = url.split('/')[-1].split('?')[0] # not very secure
+                filepath = media_dir / media_filename
+
+                if not filepath.is_file():
+                    response = requests.get(url)   
+                    response.raise_for_status()
+
+                    with filepath.open('wb') as file:
+                        file.write(response.content)
 
             ads_collection.update_one(
                 {'_id': ad['_id'] },
