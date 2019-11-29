@@ -90,7 +90,7 @@ def connect_facebook(user, password, totp):
     return browser
 
 
-def get_user_token(browser):
+def get_user_token(browser, app_id):
     #print(response.read())
     #print(cookies)
 
@@ -104,7 +104,7 @@ def get_user_token(browser):
 
     browser.set_handle_redirect(False)
     params = urllib.parse.urlencode({
-        'client_id': config.APP_ID,
+        'client_id': app_id,
         # Make sure to define this url in facebook app's parameters (product login/parameters)
         # This callback does not have to be implemented, because the redirection is caught
         'redirect_uri': 'https://desinfo.quaidorsay.fr/api/ads/1.0/callback',
@@ -124,7 +124,7 @@ def get_user_token(browser):
     return user_access_token
 
 
-def connect_and_get_user_token(user, password, totp):
+def connect_and_get_user_token(user, app_id, password, totp):
     browser = connect_facebook(user=user, password=password, totp=totp)
-    user_access_token = get_user_token(browser)
+    user_access_token = get_user_token(browser=browser, app_id=app_id)
     return user_access_token, browser

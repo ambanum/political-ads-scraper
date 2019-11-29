@@ -19,7 +19,7 @@ from facebook_fetch import snapshot
 from facebook_fetch.fb_login import login
 
 
-def process_batch(user, password, totp):
+def process_batch(user, app_id, password, totp):
 
     media_dir = config.DATA_DIR / 'facebook/media'
 
@@ -28,7 +28,7 @@ def process_batch(user, password, totp):
 
     ads_collection.create_index('ad_id')
 
-    user_access_token, browser = login.connect_and_get_user_token(user=user, password=password, totp=totp)
+    user_access_token, browser = login.connect_and_get_user_token(user=user, app_id=app_id, password=password, totp=totp)
 
     ads_to_process = ads_collection.find({"snapshot" : {"$exists" : False}})
 
@@ -77,7 +77,7 @@ def process_batch(user, password, totp):
         except Exception:
             logging.exception('Something happened')
             time.sleep(5)
-            #user_access_token, browser = login.connect_and_get_user_token(user=config.FB_USER, password=config.FB_PASSWORD, totp=config.TOTP_SECRET)
+            #user_access_token, browser = login.connect_and_get_user_token(...)
 
 
 #while True:
@@ -92,7 +92,12 @@ if __name__ == '__main__':
     try:
         user = config.FB_USER
     except AttributeError:
-        user = input('Please enter your facebook account email: ')
+        user = input('Facebook account email: ')
+
+    try:
+        app_id = config.APP_ID
+    except AttributeError:
+        app_id = input('App ID: ')
 
     try:
         password = config.FB_PASSWORD
@@ -100,8 +105,8 @@ if __name__ == '__main__':
         password = getpass.getpass('Password (hidden): ')
 
     try:
-        password = config.TOTP_SECRET
+        totp = config.TOTP_SECRET
     except AttributeError:
         totp = getpass.getpass('TOTP secret (hidden): ')
 
-    process_batch(user=user, password=password, totp=totp)
+    process_batch(user=user, app_id=app_id, password=password, totp=totp)
