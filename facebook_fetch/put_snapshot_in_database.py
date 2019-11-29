@@ -77,7 +77,7 @@ def process_batch(user, app_id, password, totp):
         except Exception:
             logging.exception('Something happened')
             time.sleep(5)
-            #user_access_token, browser = login.connect_and_get_user_token(...)
+            user_access_token, browser = login.connect_and_get_user_token(user=user, app_id=app_id, password=password, totp=totp)
 
 
 #while True:
