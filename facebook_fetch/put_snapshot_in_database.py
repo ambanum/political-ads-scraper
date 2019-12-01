@@ -9,6 +9,7 @@ only for the 2nd batch. (because CDN urls of the media expire in a few months)
 import time
 import logging
 import getpass
+import sys
 
 from pymongo import MongoClient
 import requests
@@ -80,14 +81,6 @@ def process_batch(user, app_id, password, totp):
             user_access_token, browser = login.connect_and_get_user_token(user=user, app_id=app_id, password=password, totp=totp)
 
 
-#while True:
-#    try:
-#        process_batch()
-
-#    except Exception:
-#        logging.exception('Something happened')
-#        time.sleep(5)
-
 if __name__ == '__main__':
     try:
         user = config.FB_USER
@@ -109,4 +102,12 @@ if __name__ == '__main__':
     except AttributeError:
         totp = getpass.getpass('TOTP secret (hidden): ')
 
-    process_batch(user=user, app_id=app_id, password=password, totp=totp)
+
+    while True:
+        try:
+            process_batch(user=user, app_id=app_id, password=password, totp=totp)
+            sys.exit(0)
+
+        except Exception:
+            logging.exception('Something happened')
+            time.sleep(5)
