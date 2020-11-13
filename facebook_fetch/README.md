@@ -1,13 +1,20 @@
 
 ## Serve FB user token
 
+Cheatsheet:
+
 ```
+pew workon political-ads-scraper
+
 tmux new -s fbtoken
 tmux attach-session -t fbtoken
+
 git clone https://github.com/ambanum/political-ads-scraper.git
-pew new desinfo
-pip install uwsgi flask pyotp requests mechanize
-python serve_token.py
+
+python facebook_fetch/fb_login/serve_token.py
+
+pip install uwsgi
+cd facebook_fetch/fb_login
 uwsgi --ini uwsgi.ini
 ```
 
@@ -28,7 +35,7 @@ server {
 }
 ```
 
-`credentials.py`:
+`config.py`:
 ```
 APP_ID = 'xxx'
 APP_SECRET = 'xxx'

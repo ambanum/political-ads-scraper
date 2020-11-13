@@ -2,7 +2,7 @@ The goal of this work is to improve access to information about political advert
 
 ## Install
 
-The isntractions are for ubuntu.
+The install instructions are for ubuntu.
 
 ### Create a virtualenv
 
