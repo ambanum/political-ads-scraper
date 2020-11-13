@@ -55,7 +55,7 @@ def try_app_token():
     test_token(app_token)
 
 
-def connect_facebook(user, password, totp):
+def connect_facebook(user, password, totp_secret):
     # Setup browser
     browser = mechanize.Browser()
     cookies = http.cookiejar.LWPCookieJar()
@@ -70,22 +70,44 @@ def connect_facebook(user, password, totp):
 
     # Login page
     url = 'https://m.facebook.com/login.php'
-    browser.open(url)
+    response1 = browser.open(url)
+    with open('response1.html', 'wb') as f:
+        f.write(response1.read())
+
     browser.select_form(nr=0)
     browser.form['email'] = user
     browser.form['pass'] = password
-    browser.submit()
+    response2 = browser.submit()
+    with open('response2.html', 'wb') as f:
+        f.write(response2.read())
+
+    # Novembre 2020: need to make another try
+    # maybe change text_regex to "Log In" if language is English
+    response3 = browser.follow_link(text_regex=r"Connexion", nr=0)
+    with open('response3.html', 'wb') as f:
+        f.write(response3.read())
+
+    browser.select_form(nr=0)
+    browser.form['email'] = user
+    browser.form['pass'] = password
+    response4 = browser.submit()
+    with open('response4.html', 'wb') as f:
+        f.write(response4.read())
 
     # 2FA
-    totp = pyotp.TOTP(totp)
+    totp = pyotp.TOTP(totp_secret)
     browser.select_form(nr=0)
     browser.form['approvals_code'] = totp.now()
-    browser.submit()
+    response5 = browser.submit()
+    with open('response5.html', 'wb') as f:
+        f.write(response5.read())
 
     # Do not remember browser
     browser.select_form(nr=0)
     browser.form['name_action_selected'] = ['dont_save']
-    browser.submit()
+    response6 = browser.submit()
+    with open('response6.html', 'wb') as f:
+        f.write(response6.read())
 
     return browser
 
@@ -124,7 +146,7 @@ def get_user_token(browser, app_id):
     return user_access_token
 
 
-def connect_and_get_user_token(user, app_id, password, totp):
-    browser = connect_facebook(user=user, password=password, totp=totp)
+def connect_and_get_user_token(user, app_id, password, totp_secret):
+    browser = connect_facebook(user=user, password=password, totp_secret=totp_secret)
     user_access_token = get_user_token(browser=browser, app_id=app_id)
     return user_access_token, browser

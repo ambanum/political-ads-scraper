@@ -2,6 +2,8 @@ creds.py
 credentials.py
 config.py
 
+response*.html
+
 .ipynb_checkpoints
 __pycache__
 *.egg-info
