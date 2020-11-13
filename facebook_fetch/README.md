@@ -11,8 +11,10 @@ tmux attach-session -t fbtoken
 
 git clone https://github.com/ambanum/political-ads-scraper.git
 
+# For local testing
 python facebook_fetch/fb_login/serve_token.py
 
+# On remote server
 pip install uwsgi
 cd facebook_fetch/fb_login
 uwsgi --ini uwsgi.ini

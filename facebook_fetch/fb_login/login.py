@@ -140,6 +140,8 @@ def get_user_token(browser, app_id):
     except urllib.error.HTTPError as response:
         redirect_location = response.headers['Location']
 
+    # NB: API Graph access can be deactivated if the app is not used for some time.
+
     fragment = urllib.parse.urlparse(redirect_location).fragment
     user_access_token = urllib.parse.parse_qs(fragment)['access_token'][0]
 
