@@ -163,7 +163,7 @@ def try_fetch_country(country_code, page_size, token):
     ads_batches = []
 
     def write_ads_to_file(country_code, index_file, ads_batches):
-        file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_part-{}.json'.format(
+        file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_{}_part-{}.json'.format(
             country_code,
             datetime.datetime.now().strftime("%Y-%m-%d"),
             index_file,
