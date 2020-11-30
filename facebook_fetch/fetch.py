@@ -11,6 +11,7 @@ import requests
 from facebook_fetch import config
 
 FIELDS = [
+    'id',
     'ad_creation_time',
     'ad_creative_body',
     'ad_creative_link_caption',
@@ -25,6 +26,8 @@ FIELDS = [
     'impressions',
     'page_id',
     'page_name',
+    'potential_reach',
+    'publisher_platforms',
     'region_distribution',
     'spend',
 ]
@@ -91,8 +94,11 @@ AD_ID_REGEX = re.compile(r'^https://www\.facebook\.com/ads/archive/render_ad/\?i
 def get_ad_id(ad):
     return AD_ID_REGEX.match(ad['ad_snapshot_url']).groups()[0]
 
-def fetch(country_code, page_size, token):
-    def make_request(token_value, after=None):
+def try_fetch_country(country_code, page_size, token):
+    FIRST_REQUEST_POINTER = "first request"
+    NO_MORE_LEFT_POINTER = "no more left"
+
+    def make_request(token_value, pointer):
         ADS_API_URL = "https://graph.facebook.com/v3.3/ads_archive"
 
         params = {
@@ -105,8 +111,8 @@ def fetch(country_code, page_size, token):
             'limit': page_size,
             'access_token': token_value,
         }
-        if after:
-            params['after'] = after
+        if pointer != FIRST_REQUEST_POINTER:
+            params['after'] = pointer
 
         response = None
         nb_retry = 0
@@ -147,32 +153,70 @@ def fetch(country_code, page_size, token):
             paging = json_data['paging']
             assert set(paging) <= {'cursors', 'next', 'previous'}, paging
             assert set(paging['cursors']) <= {'after', 'before'}, paging
-            after = json_data['paging']['cursors'].get('after')
+            pointer = json_data['paging']['cursors'].get('after')
         else:
-            after = None
+            pointer = NO_MORE_LEFT_POINTER
 
-        return ads, after
+        return ads, pointer
 
-    ads, after = make_request(token_value=token.token)
-    while(after):
-        ads_batch, after = make_request(token_value=token.token, after=after)
-        ads += ads_batch
+    pointer_list = [FIRST_REQUEST_POINTER]
+    ads_batches = []
 
-    return ads
+    def write_ads_to_file(country_code, index_file, ads_batches):
+        file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_part-{}.json'.format(
+            country_code,
+            datetime.datetime.now().strftime("%Y-%m-%d"),
+            index_file,
+        )  # "%Y-%m-%d_%H-%M-%S"
+        flattened_ads = [
+            ad
+            for ads_batch in ads_batches
+            for ad in ads_batch
+        ]
+
+        with open(file_path, 'w') as outfile:
+            json.dump(flattened_ads, outfile)
+
+    index_file = 0
+    while(pointer_list[-1] != NO_MORE_LEFT_POINTER):
+        pointer = pointer_list[-1]
+        print('Beginning batch', len(pointer_list), 'with pointer', pointer)
+        ads_batch, new_pointer = make_request(token_value=token.token, pointer=pointer)
+        print('Found', len(ads_batch), 'ads.')
+        pointer_list.append(new_pointer)
+        ads_batches.append(ads_batch)
+
+        if len(ads_batches) >= 100:
+            write_ads_to_file(
+                country_code=country_code,
+                index_file=index_file,
+                ads_batches=ads_batches,
+            )
+
+            index_file += 1
+            ads_batches = []
+
+    write_ads_to_file(
+        country_code=country_code,
+        index_file=index_file,
+        ads_batches=ads_batches,
+    )
 
 
-def write_to_file(country_code, page_size, token):
-    ads = None
+def fetch_country(country_code, page_size, token):
+    success = False
     nb_retry = 0
-    while not ads and nb_retry < 5:
+    while not success and nb_retry < 5:
         try:
             nb_retry += 1
 
-            ads = fetch(
+            try_fetch_country(
                 country_code=country_code,
                 page_size=page_size,
                 token=token,
             )
+
+            success = True
 
         except Exception as exception:
             print('{} Fetch failed'.format(datetime.datetime.now()))
@@ -180,14 +224,9 @@ def write_to_file(country_code, page_size, token):
             if exception.__class__.__name__ == 'KeyboardInterrupt':
                 raise
 
-    if not ads:
+    if not success:
         print('Could not fetch ads for country {}'.format(country_code))
-        return
 
-    file_path = config.DATA_DIR / 'facebook/API' / country_code / 'facebook-ads-archive_{}_{}.json'.format(country_code, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-
-    with open(file_path, 'w') as outfile:
-        json.dump(ads, outfile)
 
 
 # python -c "from facebook_fetch import fetch; fetch.create_dirs()"
@@ -206,7 +245,8 @@ if __name__ == '__main__':
     token = FacebookToken()
 
     for country in COUNTRIES:
-        write_to_file(
+        print('Fetching ads for country {}', country)
+        fetch_country(
             country_code=country['code'],
             page_size=country['page_size'],
             token=token,
