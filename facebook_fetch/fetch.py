@@ -34,31 +34,31 @@ FIELDS = [
 COUNTRIES = [
     {'code': 'AT', 'page_size': 250}, # Austria
     {'code': 'BE', 'page_size': 250}, # Belgium
-    {'code': 'BG', 'page_size': 250}, # Bulgaria
-    {'code': 'CY', 'page_size': 250}, # Cyprus
+    {'code': 'BG', 'page_size': 100}, # Bulgaria
+    {'code': 'CY', 'page_size': 100}, # Cyprus
     {'code': 'CZ', 'page_size': 250}, # Czechia
-    {'code': 'DE', 'page_size': 1000}, # Germany
+    {'code': 'DE', 'page_size': 500}, # Germany
     {'code': 'DK', 'page_size': 250}, # Denmark
-    {'code': 'EE', 'page_size': 250}, # Estonia
+    {'code': 'EE', 'page_size': 100}, # Estonia
     {'code': 'ES', 'page_size': 250}, # Spain
     {'code': 'FI', 'page_size': 250}, # Finland
     {'code': 'FR', 'page_size': 250}, # France
-    {'code': 'GR', 'page_size': 250}, # Greece
-    {'code': 'HR', 'page_size': 250}, # Croatia
-    {'code': 'HU', 'page_size': 250}, # Hungary
-    {'code': 'IE', 'page_size': 250}, # Ireland
+    {'code': 'GR', 'page_size': 100}, # Greece
+    {'code': 'HR', 'page_size': 100}, # Croatia
+    {'code': 'HU', 'page_size': 100}, # Hungary
+    {'code': 'IE', 'page_size': 100}, # Ireland
     {'code': 'IT', 'page_size': 250}, # Italy
-    {'code': 'LT', 'page_size': 250}, # Lithuania
-    {'code': 'LU', 'page_size': 250}, # Luxembourg
-    {'code': 'LV', 'page_size': 250}, # Latvia
-    {'code': 'MT', 'page_size': 250}, # Malta
+    {'code': 'LT', 'page_size': 100}, # Lithuania
+    {'code': 'LU', 'page_size': 100}, # Luxembourg
+    {'code': 'LV', 'page_size': 100}, # Latvia
+    {'code': 'MT', 'page_size': 100}, # Malta
     {'code': 'NL', 'page_size': 250}, # Netherlands
     {'code': 'PL', 'page_size': 250}, # Poland
-    {'code': 'PT', 'page_size': 250}, # Portugal
+    {'code': 'PT', 'page_size': 100}, # Portugal
     {'code': 'RO', 'page_size': 250}, # Romania
-    {'code': 'SI', 'page_size': 250}, # Slovenia
+    {'code': 'SI', 'page_size': 100}, # Slovenia
     {'code': 'SE', 'page_size': 250}, # Sweden
-    {'code': 'SK', 'page_size': 250}, # Slovakia
+    {'code': 'SK', 'page_size': 100}, # Slovakia
     {'code': 'GB', 'page_size': 250}, # United Kingdom
 #    {'code': 'US', 'page_size': 2000}, # United States of America
 ]
@@ -125,6 +125,7 @@ def try_fetch_country(country_code, page_size, token):
                     params=params,
                     timeout=60,
                 )
+                time.sleep(18)
 
                 assert response.status_code == 200, (response.status_code, response.text)
 
@@ -180,9 +181,9 @@ def try_fetch_country(country_code, page_size, token):
     index_file = 0
     while(pointer_list[-1] != NO_MORE_LEFT_POINTER):
         pointer = pointer_list[-1]
-        print('Beginning batch', len(pointer_list), 'with pointer', pointer)
+        print('Beginning batch', len(pointer_list), 'with pointer', pointer, flush=True)
         ads_batch, new_pointer = make_request(token_value=token.token, pointer=pointer)
-        print('Found', len(ads_batch), 'ads.')
+        print('Found', len(ads_batch), 'ads.', flush=True)
         pointer_list.append(new_pointer)
         ads_batches.append(ads_batch)
 
@@ -206,7 +207,7 @@ def try_fetch_country(country_code, page_size, token):
 def fetch_country(country_code, page_size, token):
     success = False
     nb_retry = 0
-    while not success and nb_retry < 5:
+    while not success and nb_retry < 1:
         try:
             nb_retry += 1
 
@@ -219,13 +220,13 @@ def fetch_country(country_code, page_size, token):
             success = True
 
         except Exception as exception:
-            print('{} Fetch failed'.format(datetime.datetime.now()))
+            print('{} Fetch failed'.format(datetime.datetime.now()), flush=True)
             logging.exception('Fetch failed')
             if exception.__class__.__name__ == 'KeyboardInterrupt':
                 raise
 
     if not success:
-        print('Could not fetch ads for country {}'.format(country_code))
+        print('Could not fetch ads for country {}'.format(country_code), flush=True)
 
 
 
@@ -245,7 +246,7 @@ if __name__ == '__main__':
     token = FacebookToken()
 
     for country in COUNTRIES:
-        print('Fetching ads for country {}', country)
+        print('Fetching ads for country {}'.format(country['code']), flush=True)
         fetch_country(
             country_code=country['code'],
             page_size=country['page_size'],
