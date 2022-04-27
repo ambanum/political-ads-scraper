@@ -129,7 +129,7 @@ def get_user_token(browser, app_id):
         'client_id': app_id,
         # Make sure to define this url in facebook app's parameters (product login/parameters)
         # This callback does not have to be implemented, because the redirection is caught
-        'redirect_uri': 'https://desinfo.quaidorsay.fr/api/ads/1.0/callback',
+        'redirect_uri': 'https://disinfo.quaidorsay.fr/api/ads/1.0/callback',
         'state': 'mystate',
         'response_type': 'token',
     })
@@ -146,7 +146,6 @@ def get_user_token(browser, app_id):
     user_access_token = urllib.parse.parse_qs(fragment)['access_token'][0]
 
     return user_access_token
-
 
 def connect_and_get_user_token(user, app_id, password, totp_secret):
     browser = connect_facebook(user=user, password=password, totp_secret=totp_secret)
